@@ -5,7 +5,7 @@ import numpy as np
 video_capture = cv2.VideoCapture(0)
 
 
-# return known faces encodings and face names
+# return known face encodings and face names
 def known_faces_details():
     known_face_encodings, known_face_names = [], []
     known_person_list = os.listdir("valid_persons")
