@@ -1,29 +1,32 @@
-import face_recognition, os, cv2
+import face_recognition
+import os
+import cv2
 import numpy as np
-
-
-video_capture = cv2.VideoCapture(0)
 
 
 # return known face encodings and face names
 def known_faces_details():
-    known_face_encodings, known_face_names = [], []
+    k_face_encodings, k_face_names = [], []
     known_person_list = os.listdir("valid_persons")
     for person in known_person_list:
         known_person_img = face_recognition.load_image_file(
             os.path.join("valid_persons", person)
         )
         known_person_encoding = face_recognition.face_encodings(known_person_img)[0]
-        known_face_encodings.append(known_person_encoding)
-        known_face_names.append(person.split(".")[0])
-    return known_face_encodings, known_face_names
+        k_face_encodings.append(known_person_encoding)
+        k_face_names.append(person.split(".")[0])
+    return k_face_encodings, k_face_names
 
 
 # Initialize variables
 known_face_encodings, known_face_names = known_faces_details()
+face_names = []
 face_locations = []
 face_encodings = []
 process_this_frame = True
+
+# start video capture
+video_capture = cv2.VideoCapture(0)
 
 while True:
     # Grab a single frame of video
@@ -49,7 +52,7 @@ while True:
             matches = face_recognition.compare_faces(
                 known_face_encodings, face_encoding
             )
-            name = "Unknown"
+            name = "Stranger"
 
             # the known face with the smallest distance to the new face
             face_distances = face_recognition.face_distance(
@@ -72,10 +75,10 @@ while True:
         left *= 4
 
         # Draw a red box around the unknown face and green box around the known face
-        if name == "Unknown":
+        if name == "Stranger":
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
-            # Draw a label with a name below the face
+            # Draw a label  below the face
             cv2.rectangle(
                 frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED
             )
@@ -85,7 +88,7 @@ while True:
             cv2.rectangle(
                 frame, (left, bottom - 35), (right, bottom), (0, 255, 0), cv2.FILLED
             )
-
+        # Add the name to the label
         font = cv2.FONT_HERSHEY_DUPLEX
         cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
