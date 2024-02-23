@@ -10,3 +10,6 @@
 
 >[!NOTE]
 The above instructions are specific to Mac OS and Linux.</br>
+
+**Windows specific instructions see [here](https://docs.python.org/3/library/venv.html#creating-virtual-environments)**
+    
