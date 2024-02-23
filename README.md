@@ -9,7 +9,7 @@
     ```pip install -r requirements.txt```
 
 >[!NOTE]
-The above instructions are specific to Mac OS and Linux.</br>
+The above instructions are specific to macOS and Linux.</br>
 
 **Windows specific instructions see [here](https://docs.python.org/3/library/venv.html#creating-virtual-environments)**
     
