@@ -7,3 +7,6 @@
     ```source .venv/bin/activate```
 - **Install the packages:**
     ```pip install -r requirements.txt```
+
+>[!NOTE]
+The above instructions are specific to Mac OS and Linux.</br>
