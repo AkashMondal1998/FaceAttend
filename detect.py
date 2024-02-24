@@ -6,8 +6,7 @@ from encode_face import Face
 
 
 # Get the valid face data from database
-face = Face()
-known_face_encodings, known_face_names = face.load_faces()
+known_face_encodings, known_face_names = Face.load_faces()
 
 
 # Initialize variables
