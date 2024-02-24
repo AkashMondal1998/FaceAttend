@@ -9,7 +9,7 @@
 - Mark attendance of a valid person when detected
 - Generating a csv file with attendance for a particalar date
 
-## Instructions
+## Instructions 📝
 - **Create a virtual environment:**
      ```python3 -m venv .venv```
 - **Activate the virtual environment:**
@@ -25,7 +25,7 @@ The above instructions are specific to macOS and Linux.</br>
 - **For issues with installation of the face-recognition package see [here](https://stackoverflow.com/questions/70001837/problem-in-installing-python-library-face-recognition-on-windows-10-11)**
 
    
-## Database setup
+## Database setup 🛢
 ### Create the database file
 - Create a ```valid_persons.db``` file at the root of this folder
 
