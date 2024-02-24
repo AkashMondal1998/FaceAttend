@@ -1,7 +1,15 @@
 # Face Attend (WIP)
 **An attendance system using face detection**
-## Instructions
 
+#### Whats working?
+- Adding face data of a person to the database
+- Detect face of known person using video feed
+
+#### Todo
+- Mark attendance of a valid person when detected
+- Generating a csv file with attendance for a particalar date
+
+## Instructions
 - **Create a virtual environment:**
      ```python3 -m venv .venv```
 - **Activate the virtual environment:**
