@@ -39,7 +39,7 @@ The above instructions are specific to macOS and Linux.</br>
 - Import the ```Face``` class from ```encode_face``` module</br>
 ```from encode_face import Face```
 
-- Now use the ```Face``` class's add_face method to add a face
+- Now use the ```Face``` class's add_face method to add face data and name of the person </br>
 ```Face.add_face("Person's Name","Path to the Person's image file")```
 
 - If the face was added successfully it will display</br>
