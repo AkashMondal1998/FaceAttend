@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 
 
-# return known face encodings and face names
+# return the known face encodings and face names
 def known_faces_details():
     k_face_encodings, k_face_names = [], []
     known_person_list = os.listdir("valid_persons")
@@ -90,7 +90,7 @@ while True:
             )
         # Add the name to the label
         font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+        cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (0, 0, 0), 1)
 
     # Display the resulting image
     cv2.imshow("Video", frame)
