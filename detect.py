@@ -2,24 +2,15 @@ import face_recognition
 import os
 import cv2
 import numpy as np
+from encode_face import Face
 
 
-# return the known face encodings and face names
-def known_faces_details():
-    k_face_encodings, k_face_names = [], []
-    known_person_list = os.listdir("valid_persons")
-    for person in known_person_list:
-        known_person_img = face_recognition.load_image_file(
-            os.path.join("valid_persons", person)
-        )
-        known_person_encoding = face_recognition.face_encodings(known_person_img)[0]
-        k_face_encodings.append(known_person_encoding)
-        k_face_names.append(person.split(".")[0])
-    return k_face_encodings, k_face_names
+# Get the valid face data from database
+face = Face()
+known_face_encodings, known_face_names = face.load_faces()
 
 
 # Initialize variables
-known_face_encodings, known_face_names = known_faces_details()
 face_names = []
 face_locations = []
 face_encodings = []
@@ -43,7 +34,7 @@ while True:
         # Find all the faces and face encodings in the current frame of video
         face_locations = face_recognition.face_locations(rgb_small_frame)
         face_encodings = face_recognition.face_encodings(
-            rgb_small_frame, face_locations
+            rgb_small_frame, face_locations, 2
         )
 
         face_names = []
@@ -61,11 +52,11 @@ while True:
             best_match_index = np.argmin(face_distances)
             if matches[best_match_index]:
                 name = known_face_names[best_match_index]
-
+            if name in face_names:
+                continue
             face_names.append(name)
 
     process_this_frame = not process_this_frame
-
     # Display the results
     for (top, right, bottom, left), name in zip(face_locations, face_names):
         # Scale back up face locations since the frame we detected in was scaled to 1/4 size
