@@ -42,10 +42,10 @@ class Face:
         cur.execute("SELECT name,face_encoding FROM persons")
         encodings = cur.fetchall()
         known_face_encodings = [encoding[1] for encoding in encodings]
-        know_face_names = [name[0] for name in encodings]
+        known_face_names = [name[0] for name in encodings]
         known_face_encodings = [
             np.frombuffer(encoding, dtype="float64")
             for encoding in known_face_encodings
         ]
         con.close()
-        return known_face_encodings, know_face_names
+        return known_face_encodings, known_face_names
