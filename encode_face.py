@@ -14,7 +14,8 @@ def connect():
 
 class Face:
     # add the face encoding bytes to the database for the specific person
-    def add_face(self, img_file, name):
+    @staticmethod
+    def add_face(name, img_file):
         img = load_image_file(img_file)
         faceloc = face_locations(img)
         face_encode = face_encodings(img, faceloc, 1)[0]
@@ -27,12 +28,13 @@ class Face:
             )
             con.commit()
             con.close()
-            return "Person Added"
+            return "Face Added!"
         except sqlite3.IntegrityError:
-            return "Person already exists!"
+            return "Face already exists!"
 
     # read all the face_encodings and names from the database and return and list containg all the known face_encodings and name
-    def load_faces(self):
+    @staticmethod
+    def load_faces():
         """Todo: read all the face_encodings from the database and return and list
         Containg all the known face_encodings"""
         con = connect()
