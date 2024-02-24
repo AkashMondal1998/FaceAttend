@@ -35,8 +35,6 @@ class Face:
     # read all the face_encodings and names from the database and return and list containg all the known face_encodings and name
     @staticmethod
     def load_faces():
-        """Todo: read all the face_encodings from the database and return and list
-        Containg all the known face_encodings"""
         con = connect()
         cur = con.cursor()
         cur.execute("SELECT name,face_encoding FROM persons")
