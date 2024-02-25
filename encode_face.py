@@ -22,6 +22,8 @@ class Face:
     # add the face encoding bytes to the database for the specific person
     @staticmethod
     def add_face(name, img_file):
+        if not img_file:
+            return "An image file is required!"
         if not name:
             return "Name is required!"
         try:
