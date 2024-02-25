@@ -5,6 +5,12 @@ from face_recognition import (
 )
 import sqlite3
 import numpy as np
+import random
+
+
+# generate a random 10 digit number for emp id
+def generate_emp_id():
+    return str(random.randint(1000000000, 9999999999))
 
 
 def connect():
@@ -16,19 +22,25 @@ class Face:
     # add the face encoding bytes to the database for the specific person
     @staticmethod
     def add_face(name, img_file):
-        img = load_image_file(img_file)
+        if not name:
+            return "Name is required!"
+        try:
+            img = load_image_file(img_file)
+        except FileNotFoundError:
+            return f"Wrong Path or file name! No such file as '{img_file}'"
         faceloc = face_locations(img)
         face_encode = face_encodings(img, faceloc, 1)[0]
+        emp_id = generate_emp_id()
         con = connect()
         cur = con.cursor()
         try:
             cur.execute(
-                "INSERT INTO persons (name,face_encoding) VALUES(?,?)",
-                (name, face_encode.tobytes()),
+                "INSERT INTO persons (name,emp_id,face_encoding) VALUES(?,?,?)",
+                (name, emp_id, face_encode.tobytes()),
             )
             con.commit()
             con.close()
-            return "Face Added!"
+            return f"Face added for {name} with employee id {emp_id}"
         except sqlite3.IntegrityError:
             return "Face already exists!"
 
