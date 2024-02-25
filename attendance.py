@@ -15,8 +15,8 @@ class Attendance:
         con = connect()
         cur = con.cursor()
         cur.execute(
-            "SELECT * FROM attendance WHERE date = ? AND user_id = (SELECT id FROM persons WHERE face_encoding = ?)",
-            (datetime.today().strftime("%d-%m-%Y"), face_encoding.tobytes()),
+            "SELECT * FROM attendance WHERE date = ? AND person_id = (SELECT id FROM persons WHERE face_encoding = ?)",
+            (datetime.today().strftime("%Y-%m-%d"), face_encoding.tobytes()),
         )
         if not cur.fetchone():
             return False
@@ -28,17 +28,20 @@ class Attendance:
     def mark_attendance(face_encodings: list):
         con = connect()
         cur = con.cursor()
-        for encoding in face_encodings:
-            if not Attendance.if_marked(encoding):
-                cur.execute(
-                    "SELECT id from persons WHERE face_encoding = ?",
-                    (encoding.tobytes()),
-                )
-                user_id = cur.fetchone()[0]
-                cur.execute(
-                    "INSERT INTO attendance(date,user_id) VALUES(?,?)",
-                    (datetime.today().strftime("%d-%m-%Y"), user_id),
-                )
+        if face_encodings:
+            for encoding in face_encodings:
+                if Attendance.if_marked(encoding) == False:
+                    cur.execute(
+                        "SELECT id from persons WHERE face_encoding = ?",
+                        (encoding.tobytes(),),
+                    )
+                    person_id = cur.fetchone()[0]
+                    print(person_id)
+                    cur.execute(
+                        "INSERT INTO attendance(date,person_id) VALUES(?,?)",
+                        (datetime.today().strftime("%Y-%m-%d"), person_id),
+                    )
+                    con.commit()
 
     # generate a csv with the attendance for a particular date
     @staticmethod
@@ -50,10 +53,11 @@ class Attendance:
         con = connect()
         cur = con.cursor()
         cur.execute(
-            "SELECT name,emp_id FROM persons WHERE id = (SELECT user_id FROM attendance WHERE date = ?)",
-            (date_for_attendance),
+            "SELECT name,emp_id FROM persons WHERE id IN(SELECT person_id FROM attendance WHERE date = ?)",
+            (date_for_attendance,),
         )
         results = cur.fetchall()
+        print(results)
         if not results:
             return f"No data available for {date_for_attendance}"
         with open(f"{date_for_attendance}.csv", "w") as csvfile:
