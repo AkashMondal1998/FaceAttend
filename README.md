@@ -1,4 +1,4 @@
-# Face Attend (WIP)
+# Face Attend
 **An attendance system using face detection**
 
 #### Whats working?
