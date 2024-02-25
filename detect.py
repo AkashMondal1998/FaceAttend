@@ -3,7 +3,7 @@ import os
 import cv2
 import numpy as np
 from encode_face import Face
-
+from attendance import Attendance
 
 # Get the valid face data from database
 known_face_encodings, known_face_names = Face.load_faces()
@@ -37,6 +37,7 @@ while True:
         )
 
         face_names = []
+        attendance_face_encodings = []
         for face_encoding in face_encodings:
             # See if the face is a match for the known face(s)
             matches = face_recognition.compare_faces(
@@ -51,10 +52,14 @@ while True:
             best_match_index = np.argmin(face_distances)
             if matches[best_match_index]:
                 name = known_face_names[best_match_index]
+                encoding = known_face_encodings[best_match_index]
             if name in face_names:
                 continue
             face_names.append(name)
-
+            if name != "Stranger":
+                attendance_face_encodings.append(encoding)
+    
+    Attendance.mark_attendance(attendance_face_encodings)
     process_this_frame = not process_this_frame
     # Display the results
     for (top, right, bottom, left), name in zip(face_locations, face_names):
