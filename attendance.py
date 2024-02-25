@@ -36,7 +36,6 @@ class Attendance:
                         (encoding.tobytes(),),
                     )
                     person_id = cur.fetchone()[0]
-                    print(person_id)
                     cur.execute(
                         "INSERT INTO attendance(date,person_id) VALUES(?,?)",
                         (datetime.today().strftime("%Y-%m-%d"), person_id),
@@ -57,7 +56,6 @@ class Attendance:
             (date_for_attendance,),
         )
         results = cur.fetchall()
-        print(results)
         if not results:
             return f"No data available for {date_for_attendance}"
         with open(f"{date_for_attendance}.csv", "w") as csvfile:
