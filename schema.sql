@@ -1,5 +1,6 @@
 CREATE TABLE persons(
 id INTEGER PRIMARY KEY,
 name TEXT NOT NULL,
+emp_id TEXT NOT NULL,
 face_encoding BLOB UNIQUE NOT NULL
 );
