@@ -1,6 +1,9 @@
 import sqlite3
 import csv
 from datetime import datetime, date
+from gtts import gTTS
+from pygame import mixer
+import os
 
 
 def connect():
@@ -32,15 +35,18 @@ class Attendance:
             for encoding in face_encodings:
                 if Attendance.if_marked(encoding) == False:
                     cur.execute(
-                        "SELECT id from persons WHERE face_encoding = ?",
+                        "SELECT id,name from persons WHERE face_encoding = ?",
                         (encoding.tobytes(),),
                     )
-                    person_id = cur.fetchone()[0]
+                    result = cur.fetchone()
+                    name = result[1]
+                    person_id = result[0]
                     cur.execute(
                         "INSERT INTO attendance(date,person_id) VALUES(?,?)",
                         (datetime.today().strftime("%Y-%m-%d"), person_id),
                     )
                     con.commit()
+                    Attendance.give_feedback(f"{name} your attendance has been noted")
 
     # generate a csv with the attendance for a particular date
     @staticmethod
@@ -64,3 +70,13 @@ class Attendance:
             for result in results:
                 writer.writerow(result)
         return f"CSV file generated!"
+
+    # play the feedback sound
+    @staticmethod
+    def give_feedback(text):
+        tts = gTTS(text)
+        tts.save("feedback.mp3")
+        mixer.init()
+        sound = mixer.Sound("feedback.mp3")
+        sound.play()
+        os.remove("feedback.mp3")
