@@ -46,6 +46,18 @@ class Face:
         except sqlite3.IntegrityError:
             return "Face already exists!"
 
+    # Delete the person from database given its emp id
+    @staticmethod
+    def delete_face(emp_id):
+        con = connect()
+        cur = con.cursor()
+        cur.execute("SELECT * FROM persons WHERE emp_id = ?", (emp_id,))
+        if not cur.fetchone():
+            return f"No person with emp id of {emp_id} was found!"
+        cur.execute("DELETE FROM persons WHERE emp_id = ?", (emp_id,))
+        con.commit()
+        return f"Person with {emp_id} has been removed!"
+
     # read all the face_encodings and names from the database and return and list containg all the known face_encodings and name
     @staticmethod
     def load_faces():
