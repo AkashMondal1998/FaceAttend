@@ -41,7 +41,7 @@ while True:
         for face_encoding in face_encodings:
             # See if the face is a match for the known face(s)
             matches = face_recognition.compare_faces(
-                known_face_encodings, face_encoding
+                known_face_encodings, face_encoding, tolerance=0.5
             )
             name = "Stranger"
 
@@ -58,7 +58,7 @@ while True:
             face_names.append(name)
             if name != "Stranger":
                 attendance_face_encodings.append(encoding)
-    
+
     Attendance.mark_attendance(attendance_face_encodings)
     process_this_frame = not process_this_frame
     # Display the results
