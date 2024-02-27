@@ -31,7 +31,7 @@ class Face:
         except FileNotFoundError:
             return f"Wrong Path or file name! No such file as '{img_file}'"
         faceloc = face_locations(img)
-        face_encode = face_encodings(img, faceloc, 2)[0]
+        face_encode = face_encodings(img, faceloc, 1)[0]
         emp_id = generate_emp_id()
         con = connect()
         cur = con.cursor()
