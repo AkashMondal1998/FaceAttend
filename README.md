@@ -1,5 +1,6 @@
 # Face Attend
-**An attendance system using face detection**
+![Header](./header.png)
+
 
 ## Features
 - Adding face data of a person to the database
