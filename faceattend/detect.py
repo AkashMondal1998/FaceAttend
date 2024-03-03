@@ -4,11 +4,12 @@ import numpy as np
 from faceattend.face import Face
 from faceattend.attendance import Attendance
 
-# Get the valid face data from database
-known_face_encodings, known_face_names = Face.load_faces()
-
 
 def detect_face():
+
+    # Get the valid face data from database
+    known_face_encodings, known_face_names = Face.load_faces()
+
     # Initialize variables
     face_names = []
     face_locations = []
@@ -97,3 +98,7 @@ def detect_face():
     # Release handle to the webcam
     video_capture.release()
     cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    detect_face()
