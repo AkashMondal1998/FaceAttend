@@ -27,8 +27,6 @@ The above instructions are specific to macOS and Linux.</br>
    
 ## Database setup 🛢
 ### Create the database
-- Open the python interactive console</br>
-```python3``` or ```python```
 
 - Import the ```create_database()``` function from ```create_database``` module</br>
 ```from faceattend.create_datebase import create_database```
@@ -39,8 +37,6 @@ The above instructions are specific to macOS and Linux.</br>
 ```Database created!```
 
 ### Add valid faces in database
-- Open the python interactive console</br>
-```python3``` or ```python```
 
 - Import the ```Face``` class from ```face``` module</br>
 ```from faceattend.face import Face```
@@ -67,4 +63,7 @@ The above instructions are specific to macOS and Linux.</br>
 
 
 ## How to run?
-```python3 detect.py``` or ```python detect.py```
+- Import the ```detect_face()``` function from the ```detect``` module</br>
+```from faceattend.detect import detect_face```
+- Then just call the ```detect_face()``` function</br>
+```detect_face()```
