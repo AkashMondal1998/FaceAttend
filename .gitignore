@@ -174,3 +174,6 @@ cython_debug/
 # Ignore csv files
 
 *.csv
+
+# Ignore my running script
+run.py
