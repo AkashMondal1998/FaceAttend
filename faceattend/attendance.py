@@ -50,7 +50,7 @@ class Attendance:
 
     # generate a csv with the attendance for a particular date
     @staticmethod
-    def generate_csv(date_for_attendance):
+    def generate_csv_date(date_for_attendance):
         try:
             date.fromisoformat(date_for_attendance)
         except ValueError:
@@ -64,9 +64,33 @@ class Attendance:
         results = cur.fetchall()
         if not results:
             return f"No data available for {date_for_attendance}"
-        with open(f"{date_for_attendance}.csv", "w") as csvfile:
+        os.makedirs("csv/", exist_ok=True)
+        with open(f"csv/{date_for_attendance}.csv", "w") as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(["Name", "Emp_id"])
+            for result in results:
+                writer.writerow(result)
+        return f"CSV file generated!"
+
+    @staticmethod
+    def generate_csv_emp(emp_id):
+        emp_id = str(emp_id)
+        con = connect()
+        cur = con.cursor()
+        cur.execute("SELECT * FROM persons WHERE emp_id =?", (emp_id,))
+        if not cur.fetchone():
+            return f"No person with emp id {emp_id} exists"
+        cur.execute(
+            "SELECT date FROM attendance WHERE person_id = (SELECT id FROM persons WHERE emp_id = ?)",
+            (emp_id,),
+        )
+        results = cur.fetchall()
+        if not results:
+            return f"No data available for employee with id {emp_id}"
+        os.makedirs("csv/", exist_ok=True)
+        with open(f"csv/{emp_id}.csv", "w") as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(["Date"])
             for result in results:
                 writer.writerow(result)
         return f"CSV file generated!"
