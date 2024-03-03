@@ -21,3 +21,7 @@ def create_database():
     )
     conn.close()
     return "Database created!"
+
+
+if __name__ == "__main__":
+    create_database()
