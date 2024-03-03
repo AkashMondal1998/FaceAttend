@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="faceattend",
-    version="0.0.3",
+    version="0.0.4",
     description="An attendance system using face recognition",
     url="https://github.com/AkashMondal1998/FaceAttend",
     author="Akash Mondal",
