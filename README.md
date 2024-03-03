@@ -1,7 +1,7 @@
 # Face Attend
 **An attendance system using face detection**
 
-#### Whats working?
+## Features
 - Adding face data of a person to the database
 - Detect face of known person using video feed
 - Mark attendance of a valid person when detected
@@ -14,8 +14,8 @@
      ```python3 -m venv .venv```
 - **Activate the virtual environment:**
     ```source .venv/bin/activate```
-- **Install the packages:**
-    ```pip install -r requirements.txt```
+- **Install the package:**
+    ```pip install faceattend```
 
 >[!NOTE]
 The above instructions are specific to macOS and Linux.</br>
@@ -26,24 +26,43 @@ The above instructions are specific to macOS and Linux.</br>
 
    
 ## Database setup 🛢
-### Create the database file
-- Create a ```valid_persons.db``` file at the root of this folder
+### Create the database
+- Open the python interactive console</br>
+```python3``` or ```python```
 
-- Then import the required tables</br>
-```cat schema.sql | sqlite3 valid_persons.db```
+- Import the ```create_database()``` function from ```create_database``` module</br>
+```from faceattend.create_datebase import create_database```
+
+- Then just use the ```create_database()``` function to create the database
+```create_database()```
+- When database is successfully created it displays</br>
+```Database created!```
 
 ### Add valid faces in database
 - Open the python interactive console</br>
 ```python3``` or ```python```
 
-- Import the ```Face``` class from ```encode_face``` module</br>
-```from encode_face import Face```
+- Import the ```Face``` class from ```face``` module</br>
+```from faceattend.face import Face```
 
 - Now use the ```Face``` class's add_face method to add face data and name of the person </br>
 ```Face.add_face("Person's Name","Path to the Person's image file")```
 
-- If the face was added successfully it will display</br>
+- If the face was added successfully it displays</br>
 ```Face Added```
+
+### Generating CSV file 
+#### For a particular date
+- Import the ```Attendance``` class from ```attendance``` module</br>
+```from faceattend.attendance import Attendance```
+- Now use ```Attendance``` class's ```generate_csv_date()``` function
+```Attendance.generate_csv_date("sample_date")```
+#### For a particular employee
+- Use ```Attendance``` class's ```generate_csv_emp()``` function
+```Attendance.generate_csv_date("emp_id")```
+
+#### If CSV file was generated it displays
+```CSV file generated!```
 
 
 
