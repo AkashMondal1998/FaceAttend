@@ -16,20 +16,18 @@
 
 
 ## Instructions 📝
-- **Create a virtual environment:**
+- Create a virtual environment:
      ```python3 -m venv .venv```
-- **Activate the virtual environment:**
+- Activate the virtual environment:
     ```source .venv/bin/activate``` or ```.\.venv\Scripts\Activate.ps1```
 
-- **On Windows make sure to do set this environment variable using powershell**
+- On Windows make sure to do set this environment variable using powershell
 ```[Environment]::SetEnvironmentVariable("PYTHONUTF8", "1", "User")```
-- **Install the package:**
+- Install the package:
     ```pip install faceattend```
 
->[!NOTE]
-The above instructions are specific to macOS and Linux.</br>
 
-### Windows specific instructions
+### Windows specific issues 
 - **Creating virtual environments see [here](https://docs.python.org/3/library/venv.html#creating-virtual-environments)**</br>
 - **For issues with installation of the face-recognition package see [here](https://stackoverflow.com/questions/70001837/problem-in-installing-python-library-face-recognition-on-windows-10-11)**
 
