@@ -56,6 +56,7 @@ class Face:
             return f"No person with emp id of {emp_id} was found!"
         cur.execute("DELETE FROM persons WHERE emp_id = ?", (emp_id,))
         con.commit()
+        con.close()
         return f"Person with {emp_id} has been removed!"
 
     # read all the face_encodings and names from the database and return and list containg all the known face_encodings and name
