@@ -21,7 +21,7 @@
 - Activate the virtual environment:
     ```source .venv/bin/activate``` or ```.\.venv\Scripts\Activate.ps1```
 
-- On Windows make sure to do set this environment variable using powershell
+- On Windows make sure to set this environment variable using powershell
 ```[Environment]::SetEnvironmentVariable("PYTHONUTF8", "1", "User")```
 - Install the package:
     ```pip install faceattend```
