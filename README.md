@@ -5,19 +5,24 @@
 
 
 
-## Features
-- Adding face data of a person to the database
-- Detect face of known person using video feed
-- Mark attendance of a valid person when detected
-- Generating a csv file with attendance for a particalar date
+## Whats working?
+- [x] Adding face data of a person to the database
+- [x] Detect face of known person using video feed
+- [x] Mark attendance of a valid person when detected
+- [x] Generating a csv file with attendance for a particalar date or a particular employee
 
+## Todo
+- [ ] Further improve the face recognition model
 
 
 ## Instructions 📝
 - **Create a virtual environment:**
      ```python3 -m venv .venv```
 - **Activate the virtual environment:**
-    ```source .venv/bin/activate```
+    ```source .venv/bin/activate``` or ```.\.venv\Scripts\Activate.ps1```
+
+- **On Windows make sure to do set this environment variable using powershell**
+```[Environment]::SetEnvironmentVariable("PYTHONUTF8", "1", "User")```
 - **Install the package:**
     ```pip install faceattend```
 
@@ -55,11 +60,11 @@ The above instructions are specific to macOS and Linux.</br>
 #### For a particular date
 - Import the ```Attendance``` class from ```attendance``` module</br>
 ```from faceattend.attendance import Attendance```
-- Now use ```Attendance``` class's ```generate_csv_date()``` function
+- Now use ```Attendance``` class's ```generate_csv_date()``` function</br>
 ```Attendance.generate_csv_date("sample_date")```
 #### For a particular employee
-- Use ```Attendance``` class's ```generate_csv_emp()``` function
-```Attendance.generate_csv_date("emp_id")```
+- Use ```Attendance``` class's ```generate_csv_emp()``` function</br>
+```Attendance.generate_csv_emp("emp_id")```
 
 #### If CSV file was generated it displays
 ```CSV file generated!```
