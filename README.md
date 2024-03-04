@@ -1,6 +1,6 @@
 # Face Attend
 <p align="center">
-    <img width = "300" height = "300" src="./face_attend.png">
+    <img width = "300" height = "300" src="https://raw.githubusercontent.com/AkashMondal1998/FaceAttend/main/face_attend.png">
 </p>
 
 
@@ -8,6 +8,7 @@
 ## Whats working?
 - [x] Adding face data of a person to the database
 - [x] Detect face of known person using video feed
+- [x] Provide audio feedback when attendance marked successfully 
 - [x] Mark attendance of a valid person when detected
 - [x] Generating a csv file with attendance for a particalar date or a particular employee
 
