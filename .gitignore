@@ -179,4 +179,4 @@ cython_debug/
 run.py
 
 #track header image file
-!header.png
+!face_attend.png
