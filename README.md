@@ -15,16 +15,21 @@
 ## Todo
 - [ ] Further improve the face recognition model
 
+## Built with
+- [face-recognition](https://github.com/ageitgey/face_recognition)
+- [opencv-python](https://github.com/opencv/opencv-python)
+- [gTTS](https://github.com/pndurette/gTTS)
+- [pygame](https://github.com/pygame/pygame)
 
 ## Instructions 📝
-- Create a virtual environment:
+- Create a virtual environment:</br>
      ```python3 -m venv .venv```
-- Activate the virtual environment:
+- Activate the virtual environment:</br>
     ```source .venv/bin/activate``` or ```.\.venv\Scripts\Activate.ps1```
 
 - On Windows make sure to set this environment variable using powershell
 ```[Environment]::SetEnvironmentVariable("PYTHONUTF8", "1", "User")```
-- Install the package:
+- Install the package:</br>
     ```pip install faceattend```
 
 
@@ -35,43 +40,36 @@
    
 ## Database setup 🛢
 ### Create the database
-
-- Import the ```create_database()``` function from ```create_database``` module</br>
-```from faceattend.create_datebase import create_database```
-
-- Then just use the ```create_database()``` function to create the database
-```create_database()```
-- When database is successfully created it displays</br>
-```Database created!```
+```
+>>> from faceattend.create_database import create_database
+>>> create_database()
+'Database created!'
+```
 
 ### Add valid faces in database
-
-- Import the ```Face``` class from ```face``` module</br>
-```from faceattend.face import Face```
-
-- Now use the ```Face``` class's add_face method to add face data and name of the person </br>
-```Face.add_face("Person's Name","Path to the Person's image file")```
-
-- If the face was added successfully it displays</br>
-```Face Added```
+```
+>>> from faceattend.face import Face
+>>> Face.add_face("Akash","Akash.jpg")
+'Face added for Akash with employee id 7277962575'
+```
 
 ### Generating CSV file 
 #### For a particular date
-- Import the ```Attendance``` class from ```attendance``` module</br>
-```from faceattend.attendance import Attendance```
-- Now use ```Attendance``` class's ```generate_csv_date()``` function</br>
-```Attendance.generate_csv_date("sample_date")```
+```
+>>> from faceattend.attendance import Attendance
+>>> Attendance.generate_csv_date("2024-03-04")
+'CSV file generated!'
+```
 #### For a particular employee
-- Use ```Attendance``` class's ```generate_csv_emp()``` function</br>
-```Attendance.generate_csv_emp("emp_id")```
-
-#### If CSV file was generated it displays
-```CSV file generated!```
-
+```
+>>> from faceattend.attendance import Attendance
+>>> Attendance.generate_csv_emp("7277962575")
+'CSV file generated!'
+```
 
 
 ## How to run?
-- Import the ```detect_face()``` function from the ```detect``` module</br>
-```from faceattend.detect import detect_face```
-- Then just call the ```detect_face()``` function</br>
-```detect_face()```
+```
+>>> from faceattend.detect import detect_face
+>>> detect_face()
+```
