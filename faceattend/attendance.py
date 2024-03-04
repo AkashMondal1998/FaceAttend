@@ -46,6 +46,7 @@ class Attendance:
                         (datetime.today().strftime("%Y-%m-%d"), person_id),
                     )
                     con.commit()
+                    con.close()
                     Attendance.give_feedback(f"{name} your attendance has been noted")
 
     # generate a csv with the attendance for a particular date
@@ -70,6 +71,7 @@ class Attendance:
             writer.writerow(["Name", "Emp_id"])
             for result in results:
                 writer.writerow(result)
+        con.close()
         return f"CSV file generated!"
 
     # generate a csv with the attendance for a particular employee
@@ -94,6 +96,7 @@ class Attendance:
             writer.writerow(["Date"])
             for result in results:
                 writer.writerow(result)
+        con.close()
         return f"CSV file generated!"
 
     # play the feedback sound
