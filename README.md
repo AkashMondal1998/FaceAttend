@@ -1,5 +1,8 @@
 # Face Attend
-![Header](./header.png)
+<p align="center">
+    <img width = "300" height = "300" src="./face_attend.png">
+</p>
+
 
 
 ## Features
