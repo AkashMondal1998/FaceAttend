@@ -72,6 +72,7 @@ class Attendance:
                 writer.writerow(result)
         return f"CSV file generated!"
 
+    # generate a csv with the attendance for a particular employee
     @staticmethod
     def generate_csv_emp(emp_id):
         emp_id = str(emp_id)
