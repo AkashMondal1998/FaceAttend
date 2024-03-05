@@ -20,6 +20,7 @@
 - [opencv-python](https://github.com/opencv/opencv-python)
 - [gTTS](https://github.com/pndurette/gTTS)
 - [pygame](https://github.com/pygame/pygame)
+- [python-email-validator](https://github.com/JoshData/python-email-validator)
 
 ## Instructions 📝
 - Create a virtual environment:</br>
