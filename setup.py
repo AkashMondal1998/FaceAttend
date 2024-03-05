@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="faceattend",
-    version="0.0.6",
+    version="0.0.7",
     description="An attendance system using face recognition",
     url="https://github.com/AkashMondal1998/FaceAttend",
     author="Akash Mondal",
@@ -22,10 +22,11 @@ setup(
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: MIT License",
         "Operating System :: POSIX :: Linux",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
+        "Operating System :: MacOS",
+        "Operating System :: Microsoft :: Windows",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
 )
