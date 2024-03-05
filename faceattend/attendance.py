@@ -69,8 +69,7 @@ class Attendance:
         with open(f"csv/{date_for_attendance}.csv", "w") as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(["Name", "Emp_id"])
-            for result in results:
-                writer.writerow(result)
+            writer.writerows(results)
         con.close()
         return "CSV file generated!"
 
@@ -94,8 +93,7 @@ class Attendance:
         with open(f"csv/{emp_id}.csv", "w") as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(["Date"])
-            for result in results:
-                writer.writerow(result)
+            writer.writerows(results)
         con.close()
         return "CSV file generated!"
 
