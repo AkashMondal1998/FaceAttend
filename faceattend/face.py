@@ -6,26 +6,47 @@ from face_recognition import (
 import sqlite3
 import numpy as np
 import random
-
+import os
+import csv
+import smtplib
 
 # generate a random 10 digit number for emp id
 def generate_emp_id():
     return str(random.randint(1000000000, 9999999999))
 
+# Send an email to the employee
+def send_email(name,emp_id,email):
+    with smtplib.SMTP('smtp.gmail.com',587) as smtp:
+        smtp.ehlo()
+        smtp.starttls()
+        smtp.ehlo()
+        mail_user = os.environ["mail_user"]
+        mail_password = os.environ["mail_password"]
+        smtp.login(mail_user,mail_password)
+        subject = "Successfully Registered!"
+        body = f"{name}, you are successfully registered.Your employee id is {emp_id}.\n\n\nYou do not have to reply to this automated-email"
+        msg = f"Subject: {subject}\n\n{body}"
+        smtp.sendmail(mail_user,email,msg)
+
+
 
 def connect():
     """Returns a connection object"""
-    return sqlite3.connect("valid_persons.db")
+    if not os.path.isfile("valid_persons.db"):
+        return False
+    return sqlite3.connect("valid_persons.db",check_same_thread=True)
 
 
 class Face:
-    # add the face encoding bytes to the database for the specific person
+    # Add the face encoding bytes to the database for the specific person
     @staticmethod
-    def add_face(name, img_file):
+    def add_face(name,email, img_file):
         if not img_file:
             return "An image file is required!"
         if not name:
             return "Name is required!"
+        if not email:
+            return "Email is required!"
         try:
             img = load_image_file(img_file)
         except FileNotFoundError:
@@ -34,14 +55,17 @@ class Face:
         face_encode = face_encodings(img, faceloc, 1)[0]
         emp_id = generate_emp_id()
         con = connect()
+        if not con:
+            return "Create database first"
         cur = con.cursor()
         try:
             cur.execute(
-                "INSERT INTO persons (name,emp_id,face_encoding) VALUES(?,?,?)",
-                (name, emp_id, face_encode.tobytes()),
+                "INSERT INTO persons (name,email,emp_id,face_encoding) VALUES(?,?,?,?)",
+                (name, email,emp_id, face_encode.tobytes()),
             )
             con.commit()
             con.close()
+            send_email(name,emp_id,email)
             return f"Face added for {name} with employee id {emp_id}"
         except sqlite3.IntegrityError:
             return "Face already exists!"
@@ -57,7 +81,7 @@ class Face:
         cur.execute("DELETE FROM persons WHERE emp_id = ?", (emp_id,))
         con.commit()
         con.close()
-        return f"Person with {emp_id} has been removed!"
+        return f"Person with emp_id {emp_id} has been removed!"
 
     # read all the face_encodings and names from the database and return and list containg all the known face_encodings and name
     @staticmethod
@@ -74,3 +98,19 @@ class Face:
         ]
         con.close()
         return known_face_encodings, known_face_names
+    
+    @staticmethod
+    def generate_emp_list():
+        con = connect()
+        cur = con.cursor()
+        cur.execute("SELECT id,name,email,emp_id FROM persons")
+        persons = cur.fetchall()
+        if not persons:
+            return "No data available!"
+        os.makedirs("csv/", exist_ok=True)
+        with open("csv/employee_list.csv", "w") as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(["No","Name","Email", "Emp_id"])
+            writer.writerows(persons)
+        con.close()
+        return f"CSV file generated!"          
