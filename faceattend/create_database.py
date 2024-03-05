@@ -17,7 +17,7 @@ def create_database():
     id INTEGER PRIMARY KEY,
     date DATE NOT NULL,
     person_id INTEGER NOT NULL,
-    FOREIGN KEY (person_id) REFERENCES persons(id)
+    FOREIGN KEY (person_id) REFERENCES persons(id) ON DELETE CASCADE
     )"""
     )
     conn.close()
