@@ -53,6 +53,13 @@
 'Face added for Akash with employee id 7277962575'
 ```
 
+### Remove face data from database
+```
+>>> from faceattend.face import Face
+>>> Face.delete_face("1894559876")
+'Person with emp_id 1894559876 has been removed!'
+```
+
 ### Generating CSV file 
 #### For a particular date
 ```
@@ -66,7 +73,12 @@
 >>> Attendance.generate_csv_emp("7277962575")
 'CSV file generated!'
 ```
-
+#### Employee list
+```
+>> from faceattend.face import Face
+>>> Face.generate_emp_list()
+'CSV file generated!'
+```
 
 ## How to run?
 ```
