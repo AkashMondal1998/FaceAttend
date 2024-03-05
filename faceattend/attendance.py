@@ -72,7 +72,7 @@ class Attendance:
             for result in results:
                 writer.writerow(result)
         con.close()
-        return f"CSV file generated!"
+        return "CSV file generated!"
 
     # generate a csv with the attendance for a particular employee
     @staticmethod
@@ -97,7 +97,7 @@ class Attendance:
             for result in results:
                 writer.writerow(result)
         con.close()
-        return f"CSV file generated!"
+        return "CSV file generated!"
 
     # play the feedback sound
     @staticmethod
