@@ -10,6 +10,8 @@ import os
 import csv
 import smtplib
 from email.message import EmailMessage
+from email_validator import validate_email, EmailNotValidError
+
 
 # generate a random 10 digit number for emp id
 def generate_emp_id():
@@ -46,8 +48,10 @@ class Face:
             return "An image file is required!"
         if not name:
             return "Name is required!"
-        if not email:
-            return "Email is required!"
+        try:
+            email = validate_email(email,check_deliverability=True)
+        except EmailNotValidError as e:
+            return str(e)
         try:
             img = load_image_file(img_file)
         except FileNotFoundError:
@@ -62,11 +66,11 @@ class Face:
         try:
             cur.execute(
                 "INSERT INTO persons (name,email,emp_id,face_encoding) VALUES(?,?,?,?)",
-                (name, email,emp_id, face_encode.tobytes()),
+                (name, email.normalized,emp_id, face_encode.tobytes()),
             )
             con.commit()
             con.close()
-            send_email(name,emp_id,email)
+            send_email(name,emp_id,email.normalized)
             return f"Face added for {name} with employee id {emp_id}"
         except sqlite3.IntegrityError:
             return "Face already exists!"
