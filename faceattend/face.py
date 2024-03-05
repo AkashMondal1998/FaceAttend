@@ -17,39 +17,41 @@ from email_validator import validate_email, EmailNotValidError
 def generate_emp_id():
     return str(random.randint(1000000000, 9999999999))
 
+
 # Send an email to the employee
-def send_email(name,emp_id,email):
-    with smtplib.SMTP('smtp.gmail.com',587) as smtp:
+def send_email(name, emp_id, email):
+    with smtplib.SMTP("smtp.gmail.com", 587) as smtp:
         smtp.ehlo()
         smtp.starttls()
         smtp.ehlo()
         msg = EmailMessage()
-        msg.set_content(f"{name}, you are successfully registered.Your employee id is {emp_id}.\n\n\nYou do not have to reply to this automated-email")
-        msg['Subject'] = "Successfully Registered!"
-        msg['From'] = os.environ["mail_user"]
-        msg['To'] = email
-        smtp.login(os.environ["mail_user"],os.environ["mail_password"])
+        msg.set_content(
+            f"Hello {name},\n\nWe're delighted to inform you that you have been successfully registered in our system.\n\nYour employee ID is: {emp_id}.\n\nThank you for joining us!\n\nBest regards,\nThe Team"
+        )
+        msg["Subject"] = "Successfully Registered!"
+        msg["From"] = os.environ["mail_user"]
+        msg["To"] = email
+        smtp.login(os.environ["mail_user"], os.environ["mail_password"])
         smtp.send_message(msg)
-
 
 
 def connect():
     """Returns a connection object"""
     if not os.path.isfile("valid_persons.db"):
         return False
-    return sqlite3.connect("valid_persons.db",check_same_thread=True)
+    return sqlite3.connect("valid_persons.db", check_same_thread=True)
 
 
 class Face:
     # Add the face encoding bytes to the database for the specific person
     @staticmethod
-    def add_face(name,email, img_file):
+    def add_face(name, email, img_file):
         if not img_file:
             return "An image file is required!"
         if not name:
             return "Name is required!"
         try:
-            email = validate_email(email,check_deliverability=True)
+            email = validate_email(email, check_deliverability=True)
         except EmailNotValidError as e:
             return str(e)
         try:
@@ -66,11 +68,11 @@ class Face:
         try:
             cur.execute(
                 "INSERT INTO persons (name,email,emp_id,face_encoding) VALUES(?,?,?,?)",
-                (name, email.normalized,emp_id, face_encode.tobytes()),
+                (name, email.normalized, emp_id, face_encode.tobytes()),
             )
             con.commit()
             con.close()
-            send_email(name,emp_id,email.normalized)
+            send_email(name, emp_id, email.normalized)
             return f"Face added for {name} with employee id {emp_id}"
         except sqlite3.IntegrityError:
             return "Face already exists!"
@@ -103,7 +105,7 @@ class Face:
         ]
         con.close()
         return known_face_encodings, known_face_names
-    
+
     # generate a csv file containing all the persons in the database
     @staticmethod
     def generate_emp_list():
@@ -116,7 +118,7 @@ class Face:
         os.makedirs("csv/", exist_ok=True)
         with open("csv/employee_list.csv", "w") as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(["No","Name","Email", "Emp_id"])
+            writer.writerow(["No", "Name", "Email", "Emp_id"])
             writer.writerows(persons)
         con.close()
-        return "CSV file generated!"          
+        return "CSV file generated!"
