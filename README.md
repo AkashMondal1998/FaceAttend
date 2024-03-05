@@ -10,7 +10,7 @@
 - [x] Detect face of known person using video feed
 - [x] Provide audio feedback when attendance marked successfully 
 - [x] Mark attendance of a valid person when detected
-- [x] Generating a csv file with attendance for a particalar date or a particular employee
+- [x] Generating a csv file with attendance for a particular date or a particular employee
 
 ## Todo
 - [ ] Further improve the face recognition model
