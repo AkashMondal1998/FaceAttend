@@ -7,6 +7,7 @@ def create_database():
         """CREATE TABLE IF NOT EXISTS persons(
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
+    email TEXT NOT NULL,
     emp_id TEXT NOT NULL,
     face_encoding BLOB UNIQUE NOT NULL
     )"""
