@@ -9,6 +9,7 @@ import random
 import os
 import csv
 import smtplib
+from email.message import EmailMessage
 
 # generate a random 10 digit number for emp id
 def generate_emp_id():
@@ -20,13 +21,13 @@ def send_email(name,emp_id,email):
         smtp.ehlo()
         smtp.starttls()
         smtp.ehlo()
-        mail_user = os.environ["mail_user"]
-        mail_password = os.environ["mail_password"]
-        smtp.login(mail_user,mail_password)
-        subject = "Successfully Registered!"
-        body = f"{name}, you are successfully registered.Your employee id is {emp_id}.\n\n\nYou do not have to reply to this automated-email"
-        msg = f"Subject: {subject}\n\n{body}"
-        smtp.sendmail(mail_user,email,msg)
+        msg = EmailMessage()
+        msg.set_content(f"{name}, you are successfully registered.Your employee id is {emp_id}.\n\n\nYou do not have to reply to this automated-email")
+        msg['Subject'] = "Successfully Registered!"
+        msg['From'] = os.environ["mail_user"]
+        msg['To'] = email
+        smtp.login(os.environ["mail_user"],os.environ["mail_password"])
+        smtp.send_message(msg)
 
 
 
@@ -99,6 +100,7 @@ class Face:
         con.close()
         return known_face_encodings, known_face_names
     
+    # generate a csv file containing all the persons in the database
     @staticmethod
     def generate_emp_list():
         con = connect()
@@ -113,4 +115,4 @@ class Face:
             writer.writerow(["No","Name","Email", "Emp_id"])
             writer.writerows(persons)
         con.close()
-        return f"CSV file generated!"          
+        return "CSV file generated!"          
