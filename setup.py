@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="faceattend",
-    version="0.0.7",
+    version="0.0.8",
     description="An attendance system using face recognition",
     url="https://github.com/AkashMondal1998/FaceAttend",
     author="Akash Mondal",
@@ -16,7 +16,13 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=["faceattend"],
-    install_requires=["face-recognition", "gTTS", "pygame", "opencv-python"],
+    install_requires=[
+        "face-recognition",
+        "gTTS",
+        "pygame",
+        "opencv-python",
+        "email-validator",
+    ],
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Science/Research",
