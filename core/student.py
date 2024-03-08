@@ -31,11 +31,15 @@ class Student:
     @staticmethod
     def delete(std_id):
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM students WHERE std_id = %s", (std_id,))
-        if not cur.fetchone():
+        cur.execute("SELECT std_img FROM students WHERE std_id = %s", (std_id,))
+        std_img = cur.fetchone()
+        if not std_img:
             return False
         cur.execute("DELETE FROM students WHERE std_id = %s", (std_id,))
         mysql.connection.commit()
+
+        # remove the associated student image from the filesystem
+        os.remove(os.path.join(UPLOAD_FOLDER, std_img[0]))
         return True
 
     # read all the face_encodings and names from the database and return and list containg all the known face_encodings and name
