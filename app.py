@@ -2,10 +2,9 @@ from flask import Flask
 from core.extensions import mysql
 from apis import api
 
-
-app = Flask(__name__)
-
 UPLOAD_FOLDER = "photos"
+
+app = Flask(__name__, static_folder=UPLOAD_FOLDER)
 
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
