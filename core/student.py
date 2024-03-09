@@ -26,7 +26,7 @@ class Student:
             (name, email, std_id, img_file),
         )
         mysql.connection.commit()
-        # send_email(name, std_id, email)
+        send_email(name, std_id, email)
         return img_file
 
     # Delete the student from database given its std_id
