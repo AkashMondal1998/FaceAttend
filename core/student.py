@@ -1,7 +1,8 @@
 from face_recognition import face_locations, face_encodings, load_image_file
 from .extensions import mysql
-from .utils import generate_std_id, send_email, give_file_ext, give_dict
+from .utils import generate_std_id, send_email, give_file_ext
 import os
+import MySQLdb.cursors
 
 
 UPLOAD_FOLDER = "photos"
@@ -18,13 +19,14 @@ class Student:
             return False
         # generate the student_id
         std_id = generate_std_id()
+        # rename the student image file
         img_file = std_id + give_file_ext(img_file)
         cur.execute(
             "INSERT INTO students (name,email,std_id,std_img) VALUES(%s,%s,%s,%s)",
             (name, email, std_id, img_file),
         )
         mysql.connection.commit()
-        send_email(name, std_id, email)
+        # send_email(name, std_id, email)
         return img_file
 
     # Delete the student from database given its std_id
@@ -42,7 +44,7 @@ class Student:
         os.remove(os.path.join(UPLOAD_FOLDER, std_img[0]))
         return True
 
-    # read all the face_encodings and names from the database and return and list containg all the known face_encodings and name
+    # read all the image file names and the student names from the database and return and list containg all the known face_encodings and name
     @staticmethod
     def load():
         cur = mysql.connection.cursor()
@@ -58,23 +60,21 @@ class Student:
             known_std_encodings.append(face_encode)
         return known_std_names, known_std_encodings
 
-    # return all the student details from the database as a dictionary
+    # return all the student details from the database
     @staticmethod
     def student_list():
-        cur = mysql.connection.cursor()
+        cur = mysql.connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
         cur.execute("SELECT name,email,std_id,std_img FROM students")
         students = cur.fetchall()
-        std_list = [give_dict(student) for student in students]
-        return std_list
+        return list(students)
 
-    # return details for a single student give their student id
+    # return details for a single student give their student id from the database
     @staticmethod
     def student(std_id):
-        cur = mysql.connection.cursor()
+        cur = mysql.connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
         cur.execute(
             "SELECT name,email,std_id,std_img FROM students WHERE std_id = %s",
             (std_id,),
         )
         student = cur.fetchone()
-        std_dict = give_dict(student)
-        return std_dict
+        return student
