@@ -108,7 +108,7 @@ def send_email(name, std_id, email):
 # check the extension of file that is being saved
 def allowed_files(filename):
     filename = filename.strip()
-    file_ext = filename.rsplit(".", 1)[1]
+    file_ext = filename.rsplit(".", 1)[1].lower()
     if file_ext in ALLOWED_EXTENSIONS:
         return True
     else:
