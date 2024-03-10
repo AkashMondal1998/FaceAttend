@@ -1,43 +1,43 @@
 from core.student import Student
-from core.utils import allowed_files
+from core.utils import allowed_files, ImageUrl
 from flask import abort, request
 from flask_restx import Resource, Namespace, fields
 from werkzeug.utils import secure_filename
 import os
 
-
 api = Namespace("students", description="Student related operations")
 
 UPLOAD_FOLDER = "photos"
 
-
-class ImagePath(fields.Raw):
-    def format(self, value):
-        return os.path.join(request.url_root, UPLOAD_FOLDER, value)
-
-
 student_model = api.model(
     "Student_list",
     {
-        "name": fields.String,
-        "email": fields.String,
-        "std_id": fields.String,
-        "std_img": ImagePath,
+        "name": fields.String(description="Name of the student"),
+        "email": fields.String(description="Email of the student"),
+        "std_id": fields.String(description="Student id of the student"),
+        "std_img": ImageUrl(description="Url for the image of the student"),
     },
 )
 
 
-# Add student info to the database and also accept an image file of the student
-# save the file to the file system
-# Expect form data containg name,email,and an image file from the client
 @api.route("/add")
 class add_student(Resource):
+    """
+    Add student info to the database and also accept an image file of the student
+    save the file to the file system
+    Expect form data containg name,email,and an image file from the client
+    """
+
     def post(self):
         if "image" not in request.files:
-            return {"msg": "Image file is required"}
+            abort(400, "Image is required!")
         image = request.files["image"]
         name = request.form.get("name")
+        if not name:
+            abort(400, "Name cannnot be blank!")
         email = request.form.get("email")
+        if not email:
+            abort(400, "Email cannot be blank")
 
         # check if the file is of supported format
         if not allowed_files(image.filename):
@@ -54,30 +54,33 @@ class add_student(Resource):
         return {"msg": f"Student added successfully"}, 201
 
 
-# Get the details of all the students
 @api.route("/get")
 class student_list(Resource):
+    """Return the details of all the students"""
+
     @api.marshal_list_with(student_model)
     def get(self):
         if not Student.student_list():
-            abort(404, "No students presesnt!")
+            abort(404, "No students present!")
         return Student.student_list()
 
 
-# Delete a student from the database
-@api.route("/delete/<id>")
+@api.route("/delete/<std_id>")
 class delete_student(Resource):
-    def delete(self, id):
-        if not Student.delete(id):
-            abort(404, f"No student with id {id} found!")
+    """Delete a student from the database"""
+
+    def delete(self, std_id):
+        if not Student.delete(std_id):
+            abort(404, f"No student with id {std_id} found!")
         return {"msg": "Student successfully removed!"}
 
 
-# Get the detail of a single student given their student id
-@api.route("/get/<id>")
+@api.route("/get/<std_id>")
 class student(Resource):
+    """Returns the detail of a single student given their student id"""
+
     @api.marshal_with(student_model)
-    def get(self, id):
-        if not Student.student(id):
-            abort(404, f"No student with id {id} found!")
-        return Student.student(id)
+    def get(self, std_id):
+        if not Student.student(std_id):
+            abort(404, f"No student with id {std_id} found!")
+        return Student.student(std_id)
