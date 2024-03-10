@@ -9,6 +9,7 @@ app = Flask(__name__, static_folder=UPLOAD_FOLDER)
 
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["MAX_CONTENT_LENGTH"] = 1 * 1000 * 1000
 app.config["MYSQL_USER"] = os.environ["db_user"]
 app.config["MYSQL_PASSWORD"] = os.environ["db_pass"]
 app.config["MYSQL_DB"] = "project"
