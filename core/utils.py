@@ -1,6 +1,7 @@
 from email.message import EmailMessage
 from flask import request
 from flask_restx import fields
+from email_validator import validate_email, EmailNotValidError
 import random
 import smtplib
 import os
@@ -125,3 +126,12 @@ def give_file_ext(filename):
 class ImageUrl(fields.Raw):
     def format(self, value):
         return os.path.join(request.url_root, UPLOAD_FOLDER, value)
+
+
+def check_email(email):
+    """Check if email is valid or not and also checks if the email is deliverable"""
+    try:
+        email_info = validate_email(email, check_deliverability=True)
+    except EmailNotValidError as e:
+        return str(e), False
+    return email_info.normalized, True
