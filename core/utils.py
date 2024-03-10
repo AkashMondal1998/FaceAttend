@@ -1,5 +1,6 @@
-from flask import request
 from email.message import EmailMessage
+from flask import request
+from flask_restx import fields
 import random
 import smtplib
 import os
@@ -118,3 +119,9 @@ def allowed_files(filename):
 def give_file_ext(filename):
     file_ext = "." + filename.rsplit(".", 1)[1]
     return file_ext
+
+
+# Custom field for student image for the student_model response
+class ImageUrl(fields.Raw):
+    def format(self, value):
+        return os.path.join(request.url_root, UPLOAD_FOLDER, value)
