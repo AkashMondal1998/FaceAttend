@@ -7,6 +7,7 @@ import os
 
 api = Namespace("students", description="Student related operations")
 
+
 UPLOAD_FOLDER = "photos"
 
 student_model = api.model(
@@ -32,6 +33,8 @@ class add_student(Resource):
         if "image" not in request.files:
             abort(400, "Image is required!")
         image = request.files["image"]
+        if not image:
+            abort(400, "Image is requried!")
         name = request.form.get("name")
         if not name:
             abort(400, "Name cannnot be blank!")
@@ -47,11 +50,11 @@ class add_student(Resource):
         # call the Student.add function to the add the student to the database
         s = Student.add(name, email, filename)
         if not s:
-            abort(400, f"Student with email {email} is already present!")
+            abort(409, f"Student with email {email} is already present!")
 
         # save the file to the file system
         image.save(os.path.join(UPLOAD_FOLDER, s))
-        return {"msg": f"Student added successfully"}, 201
+        return {"message": f"Student added successfully"}, 201
 
 
 @api.route("/get")
@@ -61,7 +64,7 @@ class student_list(Resource):
     @api.marshal_list_with(student_model)
     def get(self):
         if not Student.student_list():
-            abort(404, "No students present!")
+            abort(404, "No students are present!")
         return Student.student_list()
 
 
@@ -71,8 +74,8 @@ class delete_student(Resource):
 
     def delete(self, std_id):
         if not Student.delete(std_id):
-            abort(404, f"No student with id {std_id} found!")
-        return {"msg": "Student successfully removed!"}
+            abort(404, f"Student with id {std_id} not found!")
+        return {"message": "Student successfully removed!"}
 
 
 @api.route("/get/<std_id>")
@@ -82,5 +85,5 @@ class student(Resource):
     @api.marshal_with(student_model)
     def get(self, std_id):
         if not Student.student(std_id):
-            abort(404, f"No student with id {std_id} found!")
+            abort(404, f"Student with id {std_id} not found!")
         return Student.student(std_id)
