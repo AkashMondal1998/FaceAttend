@@ -1,6 +1,7 @@
 from core.student import Student
-from core.utils import allowed_files, ImageUrl
-from flask import abort, request
+from core.helpers import before_request
+from core.utils import allowed_files, ImageUrl, check_email
+from flask import abort, request, send_file, after_this_request
 from flask_restx import Resource, Namespace, fields
 from werkzeug.utils import secure_filename
 import os
@@ -22,7 +23,7 @@ student_model = api.model(
 
 
 @api.route("/add")
-class add_student(Resource):
+class AddStudent(Resource):
     """
     Add student info to the database and also accept an image file of the student
     save the file to the file system
@@ -30,9 +31,7 @@ class add_student(Resource):
     """
 
     def post(self):
-        if "image" not in request.files:
-            abort(400, "Image is required!")
-        image = request.files["image"]
+        image = request.files.get("image")
         if not image:
             abort(400, "Image is requried!")
         name = request.form.get("name")
@@ -41,6 +40,11 @@ class add_student(Resource):
         email = request.form.get("email")
         if not email:
             abort(400, "Email cannot be blank")
+
+        # check if email is valid
+        email, ret = check_email(email)
+        if not ret:
+            abort(400, email)
 
         # check if the file is of supported format
         if not allowed_files(image.filename):
@@ -58,28 +62,18 @@ class add_student(Resource):
 
 
 @api.route("/get")
-class student_list(Resource):
+class GetAllStudents(Resource):
     """Return the details of all the students"""
 
     @api.marshal_list_with(student_model)
     def get(self):
         if not Student.student_list():
-            abort(404, "No students are present!")
+            return " ", 204
         return Student.student_list()
 
 
-@api.route("/delete/<std_id>")
-class delete_student(Resource):
-    """Delete a student from the database"""
-
-    def delete(self, std_id):
-        if not Student.delete(std_id):
-            abort(404, f"Student with id {std_id} not found!")
-        return {"message": "Student successfully removed!"}
-
-
 @api.route("/get/<std_id>")
-class student(Resource):
+class GetStudent(Resource):
     """Returns the detail of a single student given their student id"""
 
     @api.marshal_with(student_model)
@@ -87,3 +81,28 @@ class student(Resource):
         if not Student.student(std_id):
             abort(404, f"Student with id {std_id} not found!")
         return Student.student(std_id)
+
+
+@api.route("/delete/<std_id>")
+class DeleteStudent(Resource):
+    """Delete a student from the database"""
+
+    def delete(self, std_id):
+        if not Student.delete(std_id):
+            abort(404, f"Student with id {std_id} not found!")
+        return {"message": "Student successfully removed!"}, 200
+
+
+@api.route("/csv")
+class StudentCsv(Resource):
+    """Generate a csv file containing all the student details"""
+
+    @before_request
+    def get(self):
+        @after_this_request
+        def delete_file(response):
+            os.remove("StudentList.csv")
+            return response
+
+        Student.student_csv()
+        return send_file("StudentList.csv")
