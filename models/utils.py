@@ -10,13 +10,14 @@ UPLOAD_FOLDER = "photos"
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
 
 
-# generate a random 10 digit number for std_id
 def generate_std_id():
+    """Generate a random 10 digit number for std_id"""
     return str(random.randint(1000000000, 9999999999))
 
 
-# Send an email to the student
 def send_email(name, std_id, email):
+    """Send an email to the student"""
+
     with smtplib.SMTP("smtp.gmail.com", 587) as smtp:
         smtp.ehlo()
         smtp.starttls()
@@ -106,8 +107,9 @@ def send_email(name, std_id, email):
         smtp.send_message(msg)
 
 
-# check the extension of file that is being saved
 def allowed_files(filename):
+    """Check the extension of file that is being saved"""
+
     filename = filename.strip()
     file_ext = filename.rsplit(".", 1)[1].lower()
     if file_ext in ALLOWED_EXTENSIONS:
@@ -116,20 +118,23 @@ def allowed_files(filename):
         return False
 
 
-# return the file extension
 def give_file_ext(filename):
+    """Return the file extension"""
+
     file_ext = "." + filename.rsplit(".", 1)[1]
     return file_ext
 
 
-# Custom field for student image for the student_model response
 class ImageUrl(fields.Raw):
+    """Custom field for student image for the student_model response"""
+
     def format(self, value):
         return os.path.join(request.url_root, UPLOAD_FOLDER, value)
 
 
 def check_email(email):
     """Check if email is valid or not and also checks if the email is deliverable"""
+
     try:
         email_info = validate_email(email, check_deliverability=True)
     except EmailNotValidError as e:

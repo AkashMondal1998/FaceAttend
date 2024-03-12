@@ -52,7 +52,7 @@ class Student:
 
     @staticmethod
     def load():
-        """read all the image file names and the student names from the database and return and list containg all the known face_encodings and name"""
+        """Read all the image file names and the student names from the database and return and list containg all the known face_encodings and name"""
 
         cur = mysql.connection.cursor()
         cur.execute("SELECT name,std_img FROM students")
@@ -69,7 +69,7 @@ class Student:
 
     @staticmethod
     def student_list():
-        """return all the student details from the database"""
+        """Return all the student details from the database"""
 
         cur = mysql.connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
         cur.execute("SELECT name,email,std_id,std_img FROM students")
@@ -78,7 +78,7 @@ class Student:
 
     @staticmethod
     def student(std_id):
-        """return details for a single student give their student id from the database"""
+        """Return details for a single student give their student id from the database"""
 
         cur = mysql.connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
         cur.execute(
@@ -90,7 +90,7 @@ class Student:
 
     @staticmethod
     def student_csv():
-        """generate csv containing all the students"""
+        """Generate csv containing all the students"""
 
         cur = mysql.connection.cursor()
         cur.execute("SELECT id,name,email,std_id FROM students")

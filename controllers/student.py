@@ -1,6 +1,6 @@
-from core.student import Student
-from core.helpers import before_request
-from core.utils import allowed_files, ImageUrl, check_email
+from models.student import Student
+from models.helpers import before_request, login_required
+from models.utils import allowed_files, ImageUrl, check_email
 from flask import abort, request, send_file, after_this_request
 from flask_restx import Resource, Namespace, fields
 from werkzeug.utils import secure_filename
@@ -36,8 +36,10 @@ student_model = api.model(
 @api.route("/add")
 class AddStudent(Resource):
 
+    @login_required
     def post(self):
         """Add a student"""
+
         image = request.files.get("image")
         if not image:
             abort(400, "Image is requried")
@@ -72,8 +74,9 @@ class AddStudent(Resource):
 class GetAllStudents(Resource):
 
     @api.marshal_list_with(student_list_model)
+    @login_required
     def get(self):
-        """Get  details of all the students"""
+        """Get details of all the students"""
 
         if not Student.student_list():
             return " ", 204
@@ -84,6 +87,7 @@ class GetAllStudents(Resource):
 class GetStudent(Resource):
 
     @api.marshal_with(student_model)
+    @login_required
     def get(self, std_id):
         """Get details of a single student given their student id"""
 
@@ -95,6 +99,7 @@ class GetStudent(Resource):
 @api.route("/delete/<std_id>")
 class DeleteStudent(Resource):
 
+    @login_required
     def delete(self, std_id):
         """Delete a student"""
 
