@@ -1,5 +1,5 @@
 from flask import Flask
-from models.extensions import mysql, jwt
+from models.extensions import mysql
 from controllers import api
 import os
 from datetime import timedelta
