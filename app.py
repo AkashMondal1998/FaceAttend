@@ -18,7 +18,6 @@ app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
 
 api.init_app(app)
 mysql.init_app(app)
-jwt.init_app(app)
 
 
 if __name__ == "__main__":
