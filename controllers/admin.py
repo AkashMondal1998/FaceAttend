@@ -1,11 +1,10 @@
 from flask_restx import Resource, Namespace
 from flask import jsonify, session, request, abort
-from models.helpers import login_required
+
 
 api = Namespace("admin", description="Admin related operations")
 
 
-#
 @api.route("/login")
 class login(Resource):
     def post(self):
@@ -34,9 +33,12 @@ class login(Resource):
 @api.route("/logout")
 class Logout(Resource):
 
-    @login_required
-    def get(self):
+    def post(self):
         """Logout User"""
 
+        # check if the user is logged in
+        if "username" not in session:
+            abort(401, "Please log in first before attempting to log out.")
+
         session.clear()
-        return jsonify({"message": "Logged Out successfully"})
+        return {"message": "Logged Out successfully"}
