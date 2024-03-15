@@ -1,10 +1,11 @@
-from email.message import EmailMessage
-from flask import request
-from flask_restx import fields
-from email_validator import validate_email, EmailNotValidError
+import os
 import random
 import smtplib
-import os
+from email.message import EmailMessage
+
+from email_validator import EmailNotValidError, validate_email
+from flask import request
+from flask_restx import fields
 
 UPLOAD_FOLDER = "photos"
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}

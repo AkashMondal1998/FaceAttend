@@ -1,6 +1,7 @@
 from flask_restx import Api
-from .student import api as ns1
+
 from .admin import api as ns2
+from .student import api as ns1
 
 api = Api(
     version="1.0",

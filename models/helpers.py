@@ -1,36 +1,32 @@
-from .student import Student
 from functools import wraps
-from flask import session, abort
+
+from flask import abort, session
 
 
-def before_request(f):
-    """Decorator to check if students are present"""
+def login_required(f):
+    """Decorator to check if the user if not authenticated"""
 
     @wraps(f)
     def wrapper(*args, **kwargs):
 
         # check if the user is logged in or not
-        if "username" not in session:
+        if "email" not in session:
             abort(401, "Access Denied. Please log in to access this resource")
-
-        # check if students are present
-        if not Student.student_list():
-            return " ", 204
 
         return f(*args, **kwargs)
 
     return wrapper
 
 
-def login_required(f):
-    """Decorator to check if the user if logged in"""
+def is_logged_in(f):
+    """Decorator to check if the user is already authenticated in"""
 
     @wraps(f)
     def wrapper(*args, **kwargs):
 
-        # check if the user is logged in or not
-        if "username" not in session:
-            abort(401, "Access Denied. Please log in to access this resource")
+        # check if the user is already logged in
+        if "email" in session:
+            abort(400, "You are already logged in!")
 
         return f(*args, **kwargs)
 

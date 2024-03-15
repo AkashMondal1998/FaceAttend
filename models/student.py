@@ -1,9 +1,11 @@
-from face_recognition import face_locations, face_encodings, load_image_file
-from .extensions import mysql
-from .utils import generate_std_id, send_email, give_file_ext
-import os, csv
-import MySQLdb.cursors
+import csv
+import os
 
+import MySQLdb.cursors
+from face_recognition import face_encodings, face_locations, load_image_file
+
+from .extensions import mysql
+from .utils import generate_std_id, give_file_ext, send_email
 
 UPLOAD_FOLDER = "photos"
 
@@ -52,7 +54,7 @@ class Student:
 
     @staticmethod
     def load():
-        """Read all the image file names and the student names from the database and return and list containg all the known face_encodings and name"""
+        """Read all the image file names and the student names from the database and return and list containing all the known face_encodings and name"""
 
         cur = mysql.connection.cursor()
         cur.execute("SELECT name,std_img FROM students")
@@ -95,6 +97,7 @@ class Student:
         cur = mysql.connection.cursor()
         cur.execute("SELECT id,name,email,std_id FROM students")
         students = cur.fetchall()
+
         with open(f"StudentList.csv", "w") as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(["No", "Name", "Email", "Student_id"])

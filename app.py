@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_session import Session
-from models.extensions import mysql
+from models.extensions import mysql, flask_bcrypt
 from controllers import api
 import os
 from datetime import timedelta
@@ -24,6 +24,7 @@ app.config["SESSION_PERMANENT"] = False
 
 api.init_app(app)
 mysql.init_app(app)
+flask_bcrypt.init_app(app)
 Session(app)
 
 if __name__ == "__main__":
