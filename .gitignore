@@ -183,3 +183,5 @@ run.py
 
 # dont track the server-side session folder
 .session/
+
+wait-for-it.sh
