@@ -1,9 +1,7 @@
 import os
-
 from flask import abort, after_this_request, request, send_file
 from flask_restx import Namespace, Resource, fields
 from werkzeug.utils import secure_filename
-
 from models.helpers import login_required
 from models.student import Student
 from models.utils import ImageUrl, allowed_files, check_email
@@ -62,13 +60,18 @@ class AddStudent(Resource):
             abort(400, "Image file extension not supported!")
 
         filename = secure_filename(image.filename)
-        # call the Student.add function to the add the student to the database
-        s = Student.add(name, email, filename)
-        if not s:
+
+        # check if the student is already present in the database
+        if Student.load_email(email):
             abort(409, f"Student with email {email} is already present!")
 
+        student = Student(name, email, filename)
+
+        # add the student to the database
+        img_file_name = student.add()
+
         # save the file to the file system
-        image.save(os.path.join(UPLOAD_FOLDER, s))
+        image.save(os.path.join(UPLOAD_FOLDER, img_file_name))
         return {"message": f"Student added successfully"}, 201
 
 
@@ -107,8 +110,10 @@ class DeleteStudent(Resource):
     def delete(self, std_id):
         """Delete a student"""
 
-        if not Student.delete(std_id):
+        if not Student.load_std_id(std_id):
             abort(404, f"Student with id {std_id} not found!")
+
+        Student.delete(std_id)
         return {"message": "Student successfully removed!"}, 200
 
 

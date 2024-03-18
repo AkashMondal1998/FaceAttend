@@ -1,5 +1,11 @@
 from flask_bcrypt import Bcrypt
-from flask_mysqldb import MySQL
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
 
-mysql = MySQL()
+
+class Base(DeclarativeBase, MappedAsDataclass):
+    pass
+
+
+db = SQLAlchemy(model_class=Base)
 flask_bcrypt = Bcrypt()

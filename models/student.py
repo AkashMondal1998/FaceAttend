@@ -1,64 +1,90 @@
-import csv
-import os
-
-import MySQLdb.cursors
-from face_recognition import face_encodings, face_locations, load_image_file
-
-from .extensions import mysql
+from .extensions import db
+from face_recognition import load_image_file, face_encodings, face_locations
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import String, select
 from .utils import generate_std_id, give_file_ext, send_email
+import os, csv
 
 UPLOAD_FOLDER = "photos"
 
 
-class Student:
+class Student(db.Model):
+    "Student Model"
 
-    @staticmethod
-    def add(name, email, img_file):
-        """Add the name ,std_id email,image file name to the database for the specific student"""
+    __tablename__ = "students"
 
-        cur = mysql.connection.cursor()
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
+    name: Mapped[str] = mapped_column(String(50))
+    email: Mapped[str] = mapped_column(String(255))
+    std_id: Mapped[str] = mapped_column(
+        String(10), default_factory=generate_std_id, init=False
+    )
+    std_img: Mapped[str] = mapped_column(String(255))
 
-        # check if the student is already present in the database using email as it should be unique for every student
-        cur.execute("SELECT * FROM students WHERE email = %s", (email,))
-        if cur.rowcount != 0:
-            return False
-
-        # generate the student_id
-        std_id = generate_std_id()
+    def add(self):
+        """add a student amd return the student image file name"""
 
         # rename the student image file
-        img_file = std_id + give_file_ext(img_file)
-        cur.execute(
-            "INSERT INTO students (name,email,std_id,std_img) VALUES(%s,%s,%s,%s)",
-            (name, email, std_id, img_file),
-        )
-        mysql.connection.commit()
-        send_email(name, std_id, email)
-        return img_file
+        self.std_img = self.std_id + give_file_ext(self.std_img)
+
+        db.session.add(self)
+        db.session.commit()
+
+        # send a conformation email to the student
+        send_email(self.email)
+
+        return self.std_img
+
+    @staticmethod
+    def load_email(email):
+        """load a student given their email"""
+
+        return db.session.scalars(
+            db.select(Student).where(Student.email == email)
+        ).one_or_none()
+
+    @staticmethod
+    def load_std_id(std_id):
+        """load a student given their student id"""
+
+        return db.session.scalars(
+            db.select(Student).where(Student.std_id == std_id)
+        ).one_or_none()
 
     @staticmethod
     def delete(std_id):
-        """Delete the student from database given its std_id"""
+        """delete a student give their student id"""
 
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT std_img FROM students WHERE std_id = %s", (std_id,))
-        std_img = cur.fetchone()
-        if not std_img:
-            return False
-        cur.execute("DELETE FROM students WHERE std_id = %s", (std_id,))
-        mysql.connection.commit()
+        # get the student image file name
+        std_img = Student.load_std_id(std_id).std_img
+
+        db.session.execute(db.delete(Student).where(Student.std_id == std_id))
+        db.session.commit()
 
         # remove the associated student image from the filesystem
-        os.remove(os.path.join(UPLOAD_FOLDER, std_img[0]))
-        return True
+        os.remove(os.path.join(UPLOAD_FOLDER, std_img))
+
+    @staticmethod
+    def student_list():
+        "load all the students present"
+
+        return db.session.scalars(db.select(Student)).all()
+
+    @staticmethod
+    def student(std_id):
+        """load a particular user given their student id"""
+
+        return db.session.scalars(
+            db.select(Student).where(Student.std_id == std_id)
+        ).one_or_none()
 
     @staticmethod
     def load():
-        """Read all the image file names and the student names from the database and return and list containing all the known face_encodings and name"""
+        """load the student names and student face encodings"""
 
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT name,std_img FROM students")
-        results = cur.fetchall()
+        with db.engine.connect() as conn:
+            results = conn.execute(select(Student.name, Student.std_img)).all()
+
         known_std_names = [result[0] for result in results]
         known_std_imgs = [result[1] for result in results]
         known_std_encodings = list()
@@ -70,33 +96,13 @@ class Student:
         return known_std_names, known_std_encodings
 
     @staticmethod
-    def student_list():
-        """Return all the student details from the database"""
-
-        cur = mysql.connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
-        cur.execute("SELECT name,email,std_id,std_img FROM students")
-        students = cur.fetchall()
-        return list(students)
-
-    @staticmethod
-    def student(std_id):
-        """Return details for a single student give their student id from the database"""
-
-        cur = mysql.connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
-        cur.execute(
-            "SELECT name,email,std_id,std_img FROM students WHERE std_id = %s",
-            (std_id,),
-        )
-        student = cur.fetchone()
-        return student
-
-    @staticmethod
     def student_csv():
-        """Generate csv containing all the students"""
+        """generate a csv file containing all the student details"""
 
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT id,name,email,std_id FROM students")
-        students = cur.fetchall()
+        with db.engine.connect() as conn:
+            students = conn.execute(
+                select(Student.id, Student.name, Student.email, Student.std_id)
+            ).all()
 
         with open(f"StudentList.csv", "w") as csvfile:
             writer = csv.writer(csvfile)

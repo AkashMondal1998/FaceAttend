@@ -1,51 +1,39 @@
-from .extensions import flask_bcrypt, mysql
+from .extensions import db, flask_bcrypt
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import String
 
 
-class User:
+class User(db.Model):
     """User model"""
 
-    def __init__(self, email, password):
-        self.email = email
-        self.password = password
+    __tablename__ = "users"
 
-    def add_user(self):
-        """Add user to the database"""
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
+    email: Mapped[str] = mapped_column(String(255))
+    password: Mapped[str] = mapped_column(String(60))
 
-        cur = mysql.connection.cursor()
+    def add(self):
+        """Add an user"""
 
-        # check if the user is already registered
-        cur.execute("SELECT * FROM users WHERE email = %s", (self.email,))
-        if cur.rowcount != 0:
+        self.password = flask_bcrypt.generate_password_hash(self.password)
+        db.session.add(self)
+        db.session.commit()
+
+    @staticmethod
+    def load(email):
+        """Load an user given their email"""
+
+        return db.session.scalars(
+            db.select(User).where(User.email == email)
+        ).one_or_none()
+
+    @staticmethod
+    def check_user(email, password):
+        """Check email and password of the user"""
+
+        user = User.load(email)
+        if not user:
             return False
-
-        # hash the password
-        password_hash = flask_bcrypt.generate_password_hash(self.password)
-
-        cur.execute(
-            "INSERT INTO users (email,password) VALUES(%s,%s)",
-            (self.email, password_hash),
-        )
-        mysql.connection.commit()
-
-        return True
-
-    def check_user(self):
-        """Check the details provided by the user"""
-
-        cur = mysql.connection.cursor()
-
-        cur.execute(
-            "SELECT password FROM users WHERE email = %s",
-            (self.email,),
-        )
-        password_hash = cur.fetchone()
-
-        # if there is no password associated with the email provided
-        if not password_hash:
+        if not flask_bcrypt.check_password_hash(user.password, password):
             return False
-
-        # if the password given is wrong
-        if not flask_bcrypt.check_password_hash(password_hash[0], self.password):
-            return False
-
         return True

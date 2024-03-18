@@ -1,6 +1,5 @@
 from flask import abort, request, session
 from flask_restx import Namespace, Resource
-
 from models.helpers import is_logged_in, login_required
 from models.user import User
 from models.utils import check_email
@@ -29,10 +28,8 @@ class login(Resource):
         if not ret:
             abort(400, email)
 
-        user = User(email, password)
-
         # check if the email and password are valid
-        if not user.check_user():
+        if not User.check_user(email, password):
             abort(400, "Email or password is wrong!")
 
         # if user has checked the remember me checkbox
@@ -73,6 +70,7 @@ class Register(Resource):
             abort(400, "Password is required")
         if not confirm_password:
             abort(400, "Confirm Password is required")
+
         if password != confirm_password:
             abort(400, "Password and confirm password has to be same!")
 
@@ -81,10 +79,13 @@ class Register(Resource):
         if not ret:
             abort(400, email)
 
-        user = User(email, password)
-
         # check if the user is already registered
-        if not user.add_user():
+        if User.load(email):
             abort(400, "You are already registered!")
 
-        return {"message": "Successfully registered!"}
+        user = User(email, password)
+
+        # add the user
+        user.add()
+
+        return {"message": "Successfully registered!"}, 201

@@ -19,14 +19,14 @@ def login_required(f):
 
 
 def is_logged_in(f):
-    """Decorator to check if the user is already authenticated in"""
+    """Decorator to check if the user is already authenticated"""
 
     @wraps(f)
     def wrapper(*args, **kwargs):
 
         # check if the user is already logged in
         if "email" in session:
-            abort(400, "You are already logged in!")
+            abort(403, "You are already logged in!")
 
         return f(*args, **kwargs)
 
