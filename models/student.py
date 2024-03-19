@@ -1,9 +1,11 @@
-from .extensions import db
+from extensions import db
 from face_recognition import load_image_file, face_encodings, face_locations
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, select
 from .utils import generate_std_id, give_file_ext, send_email
-import os, csv
+import os
+import csv
+
 
 UPLOAD_FOLDER = "photos"
 
@@ -31,7 +33,7 @@ class Student(db.Model):
         db.session.commit()
 
         # send a conformation email to the student
-        send_email(self.email)
+        send_email(self.name, self.std_id, self.email)
 
         return self.std_img
 
@@ -104,7 +106,7 @@ class Student(db.Model):
                 select(Student.id, Student.name, Student.email, Student.std_id)
             ).all()
 
-        with open(f"StudentList.csv", "w") as csvfile:
+        with open("StudentList.csv", "w") as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(["No", "Name", "Email", "Student_id"])
             writer.writerows(students)

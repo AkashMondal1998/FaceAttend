@@ -2,9 +2,10 @@ import os
 from flask import abort, after_this_request, request, send_file
 from flask_restx import Namespace, Resource, fields
 from werkzeug.utils import secure_filename
-from models.helpers import login_required
+from controllers.helpers import login_required
 from models.student import Student
-from models.utils import ImageUrl, allowed_files, check_email
+from .utils import ImageUrl, allowed_files, check_email
+
 
 api = Namespace("students", description="Student related operations")
 
@@ -35,18 +36,18 @@ student_model = api.model(
 
 @api.route("/add")
 class AddStudent(Resource):
-
     @login_required
     def post(self):
         """Add a student"""
 
         image = request.files.get("image")
+        name = request.form.get("name")
+        email = request.form.get("email")
+
         if not image:
             abort(400, "Image is required")
-        name = request.form.get("name")
         if not name:
             abort(400, "Name is required")
-        email = request.form.get("email")
         if not email:
             abort(400, "Email is required")
 
@@ -72,12 +73,11 @@ class AddStudent(Resource):
 
         # save the file to the file system
         image.save(os.path.join(UPLOAD_FOLDER, img_file_name))
-        return {"message": f"Student added successfully"}, 201
+        return {"message": "Student added successfully"}, 201
 
 
 @api.route("/get")
 class GetAllStudents(Resource):
-
     @api.marshal_list_with(student_list_model)
     @login_required
     def get(self):
@@ -91,7 +91,6 @@ class GetAllStudents(Resource):
 
 @api.route("/get/<std_id>")
 class GetStudent(Resource):
-
     @api.marshal_with(student_model)
     @login_required
     def get(self, std_id):
@@ -105,7 +104,6 @@ class GetStudent(Resource):
 
 @api.route("/delete/<std_id>")
 class DeleteStudent(Resource):
-
     @login_required
     def delete(self, std_id):
         """Delete a student"""
@@ -119,7 +117,6 @@ class DeleteStudent(Resource):
 
 @api.route("/csv")
 class StudentCsv(Resource):
-
     @login_required
     def get(self):
         """Generate a csv file containing all the student details"""

@@ -1,33 +1,24 @@
-import os
 import random
-import smtplib
-from email.message import EmailMessage
-
-from email_validator import EmailNotValidError, validate_email
-from flask import request
-from flask_restx import fields
-
-UPLOAD_FOLDER = "photos"
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
+from extensions import scheduler, mail
+import subprocess
+from flask_mail import Message
 
 
 def generate_std_id():
     """Generate a random 10 digit number for std_id"""
+
     return str(random.randint(1000000000, 9999999999))
 
 
 def send_email(name, std_id, email):
     """Send an email to the student"""
 
-    with smtplib.SMTP("smtp.gmail.com", 587) as smtp:
-        smtp.ehlo()
-        smtp.starttls()
-        smtp.ehlo()
-        msg = EmailMessage()
-        msg.set_content(
-            f"Hello {name},\n\nWe're delighted to inform you that you have been successfully registered in our system.\n\nYour Student ID is: {std_id}.\n\nThank you for joining us!\n\nBest regards,\nThe Team"
-        )
-        html_content = f"""
+    msg = Message()
+    msg.subject = "Successfully Registered!"
+    msg.recipients = [email]
+    msg.body = f"Hello {name},\n\nWe're delighted to inform you that you have been successfully registered in our system.\n\nYour Student ID is: {std_id}.\n\nThank you for joining us!\n\nBest regards,\nThe Team"
+
+    msg.html = f"""
         <html>
         <head>
             <style>
@@ -98,25 +89,7 @@ def send_email(name, std_id, email):
         </body>
         </html>
         """
-
-        msg.add_alternative(html_content, subtype="html")
-
-        msg["Subject"] = "Successfully Registered!"
-        msg["From"] = os.environ["mail_user"]
-        msg["To"] = email
-        smtp.login(os.environ["mail_user"], os.environ["mail_password"])
-        smtp.send_message(msg)
-
-
-def allowed_files(filename):
-    """Check the extension of file that is being saved"""
-
-    filename = filename.strip()
-    file_ext = filename.rsplit(".", 1)[1].lower()
-    if file_ext in ALLOWED_EXTENSIONS:
-        return True
-    else:
-        return False
+    mail.send(msg)
 
 
 def give_file_ext(filename):
@@ -126,18 +99,10 @@ def give_file_ext(filename):
     return file_ext
 
 
-class ImageUrl(fields.Raw):
-    """Custom field for student image for the student_model response"""
+@scheduler.task("cron", id="do_clean_up", minute="0", hour="0")
+def cleanup():
+    # A scheduled cleanup task to remove the expired session data
+    # Runs every 24 hours
 
-    def format(self, value):
-        return os.path.join(request.url_root, UPLOAD_FOLDER, value)
-
-
-def check_email(email):
-    """Check if email is valid or not and also checks if the email is deliverable"""
-
-    try:
-        email_info = validate_email(email, check_deliverability=True)
-    except EmailNotValidError as e:
-        return str(e), False
-    return email_info.normalized, True
+    subprocess.run(["flask", "session_cleanup"])
+    print("Session Cleanup Done!")

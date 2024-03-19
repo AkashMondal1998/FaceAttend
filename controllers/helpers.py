@@ -1,5 +1,4 @@
 from functools import wraps
-
 from flask import abort, session
 
 
@@ -8,9 +7,8 @@ def login_required(f):
 
     @wraps(f)
     def wrapper(*args, **kwargs):
-
         # check if the user is logged in or not
-        if "email" not in session:
+        if not session.get("email"):
             abort(401, "Access Denied. Please log in to access this resource")
 
         return f(*args, **kwargs)
@@ -18,14 +16,13 @@ def login_required(f):
     return wrapper
 
 
-def is_logged_in(f):
+def if_logged_in(f):
     """Decorator to check if the user is already authenticated"""
 
     @wraps(f)
     def wrapper(*args, **kwargs):
-
         # check if the user is already logged in
-        if "email" in session:
+        if session.get("email"):
             abort(403, "You are already logged in!")
 
         return f(*args, **kwargs)

@@ -181,9 +181,6 @@ run.py
 #track header image file
 !face_attend.png
 
-# dont track the server-side session folder
-.session/
-
 wait-for-it.sh
 
 # ignore the docker-compose file

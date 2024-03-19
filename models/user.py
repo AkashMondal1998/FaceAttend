@@ -1,4 +1,4 @@
-from .extensions import db, flask_bcrypt
+from extensions import db, flask_bcrypt
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String
 
@@ -9,6 +9,7 @@ class User(db.Model):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True, init=False)
+    name: Mapped[str] = mapped_column(String(50))
     email: Mapped[str] = mapped_column(String(255))
     password: Mapped[str] = mapped_column(String(60))
 

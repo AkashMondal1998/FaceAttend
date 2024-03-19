@@ -1,16 +1,24 @@
 from flask import abort, request, session
-from flask_restx import Namespace, Resource
-from models.helpers import is_logged_in, login_required
+from flask_restx import Namespace, Resource, fields
+from controllers.helpers import if_logged_in, login_required
 from models.user import User
-from models.utils import check_email
+from .utils import check_email
 
-api = Namespace("admin", description="Admin related operations")
+api = Namespace("user", description="User related operations")
+
+
+user = api.model(
+    "user info",
+    {
+        "name": fields.String(description="Name of the user"),
+        "email": fields.String(description="Email of the user"),
+    },
+)
 
 
 @api.route("/login")
 class login(Resource):
-
-    @is_logged_in
+    @if_logged_in
     def post(self):
         """Login User"""
 
@@ -32,18 +40,16 @@ class login(Resource):
         if not User.check_user(email, password):
             abort(400, "Email or password is wrong!")
 
-        # if user has checked the remember me checkbox
-        # then set the cookie expiration time to 7 days
-        if request.form.get("remember"):
-            session.permanent = True
+        # load the user to get the user's name
+        name = User.load(email).name
 
         session["email"] = request.form.get("email")
+        session["name"] = name
         return {"message": "Logged In successfully"}
 
 
 @api.route("/logout")
 class Logout(Resource):
-
     @login_required
     def post(self):
         """Logout User"""
@@ -54,16 +60,18 @@ class Logout(Resource):
 
 @api.route("/register")
 class Register(Resource):
-
-    @is_logged_in
+    @if_logged_in
     def post(self):
         """Register User"""
 
+        name = request.form.get("name")
         email = request.form.get("email")
         password = request.form.get("password")
         confirm_password = request.form.get("confirm_password")
 
         # check if the any of the given fields are blank
+        if not name:
+            abort(400, "Name is required!")
         if not email:
             abort(400, "Email is required!")
         if not password:
@@ -81,11 +89,21 @@ class Register(Resource):
 
         # check if the user is already registered
         if User.load(email):
-            abort(400, "You are already registered!")
+            abort(403, "You are already registered!")
 
-        user = User(email, password)
+        user = User(name, email, password)
 
         # add the user
         user.add()
 
         return {"message": "Successfully registered!"}, 201
+
+
+@api.route("/get")
+class UserInfo(Resource):
+    @api.marshal_with(user)
+    @login_required
+    def get(self):
+        """Get the authenticated  user info"""
+
+        return session
