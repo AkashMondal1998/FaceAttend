@@ -1,0 +1,21 @@
+services:
+  database:
+    image: mysql:8.0-debian
+    environment:
+      - MYSQL_ROOT_PASSWORD=mondal
+      - MYSQL_DATABASE=project
+      - MYSQL_USER=test
+      - MYSQL_PASSWORD=test
+
+  app:
+    image: mondalakash/attendance_api
+    environment:
+      - db_user=test
+      - db_pass=test
+      - db_host=database
+      - mail_user=${mail_user}
+      - mail_password=${mail_password}
+    ports:
+      - 8080:8080
+    depends_on:
+      - database

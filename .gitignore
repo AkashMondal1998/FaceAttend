@@ -183,5 +183,3 @@ run.py
 
 wait-for-it.sh
 
-# ignore the docker-compose file
-docker-compose.yml
