@@ -88,8 +88,6 @@ venv/
 # VS Code
 .vscode/
 
-.session/
-
 photos/
 
 __pycache__/

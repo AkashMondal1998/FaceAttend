@@ -1,11 +1,10 @@
-import os
 from flask import abort, after_this_request, request, send_file
 from flask_restx import Namespace, Resource, fields
 from werkzeug.utils import secure_filename
 from controllers.helpers import login_required
 from models.student import Student
 from .utils import ImageUrl, allowed_files, check_email
-
+import os
 
 api = Namespace("students", description="Student related operations")
 
@@ -36,7 +35,7 @@ student_model = api.model(
 
 @api.route("/add")
 class AddStudent(Resource):
-    @login_required
+    @login_required("user")
     def post(self):
         """Add a student"""
 
@@ -79,7 +78,7 @@ class AddStudent(Resource):
 @api.route("/get")
 class GetAllStudents(Resource):
     @api.marshal_list_with(student_list_model)
-    @login_required
+    @login_required("user")
     def get(self):
         """Get details of all the students"""
 
@@ -92,7 +91,7 @@ class GetAllStudents(Resource):
 @api.route("/get/<std_id>")
 class GetStudent(Resource):
     @api.marshal_with(student_model)
-    @login_required
+    @login_required("user")
     def get(self, std_id):
         """Get details of a single student given their student id"""
 
@@ -104,20 +103,21 @@ class GetStudent(Resource):
 
 @api.route("/delete/<std_id>")
 class DeleteStudent(Resource):
-    @login_required
+    @login_required("user")
     def delete(self, std_id):
         """Delete a student"""
 
-        if not Student.load_std_id(std_id):
+        student = Student.load_std_id(std_id)
+        if not student:
             abort(404, f"Student with id {std_id} not found!")
 
-        Student.delete(std_id)
+        student.delete()
         return {"message": "Student successfully removed!"}, 200
 
 
 @api.route("/csv")
 class StudentCsv(Resource):
-    @login_required
+    @login_required("user")
     def get(self):
         """Generate a csv file containing all the student details"""
 

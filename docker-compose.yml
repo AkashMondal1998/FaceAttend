@@ -13,6 +13,7 @@ services:
       - db_user=test
       - db_pass=test
       - db_host=database
+      - secret_key=${secret_key}
       - mail_user=${mail_user}
       - mail_password=${mail_password}
     ports:

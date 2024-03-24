@@ -37,6 +37,18 @@ class Student(db.Model):
 
         return self.std_img
 
+    def delete(self):
+        """delete a student give their student id"""
+
+        # get the student image file name
+        std_img = self.std_img
+
+        db.session.delete(self)
+        db.session.commit()
+
+        # remove the associated student image from the filesystem
+        os.remove(os.path.join(UPLOAD_FOLDER, std_img))
+
     @staticmethod
     def load_email(email):
         """load a student given their email"""
@@ -54,21 +66,8 @@ class Student(db.Model):
         ).one_or_none()
 
     @staticmethod
-    def delete(std_id):
-        """delete a student give their student id"""
-
-        # get the student image file name
-        std_img = Student.load_std_id(std_id).std_img
-
-        db.session.execute(db.delete(Student).where(Student.std_id == std_id))
-        db.session.commit()
-
-        # remove the associated student image from the filesystem
-        os.remove(os.path.join(UPLOAD_FOLDER, std_img))
-
-    @staticmethod
     def student_list():
-        "load all the students present"
+        "load all the students"
 
         return db.session.scalars(db.select(Student)).all()
 

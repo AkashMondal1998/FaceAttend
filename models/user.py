@@ -12,12 +12,19 @@ class User(db.Model):
     name: Mapped[str] = mapped_column(String(50))
     email: Mapped[str] = mapped_column(String(255))
     password: Mapped[str] = mapped_column(String(60))
+    role: Mapped[str] = mapped_column(String(4), default="user", init=False)
 
     def add(self):
         """Add an user"""
 
         self.password = flask_bcrypt.generate_password_hash(self.password)
         db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        """Delete an user"""
+
+        db.session.delete(self)
         db.session.commit()
 
     @staticmethod
@@ -29,12 +36,7 @@ class User(db.Model):
         ).one_or_none()
 
     @staticmethod
-    def check_user(email, password):
-        """Check email and password of the user"""
+    def user_list():
+        """Returns all the users"""
 
-        user = User.load(email)
-        if not user:
-            return False
-        if not flask_bcrypt.check_password_hash(user.password, password):
-            return False
-        return True
+        return db.session.scalars(db.select(User)).all()

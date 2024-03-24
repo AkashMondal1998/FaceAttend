@@ -1,7 +1,7 @@
 import random
-from extensions import scheduler, mail
-import subprocess
+from extensions import mail, flask_bcrypt
 from flask_mail import Message
+from .admin import Admin
 
 
 def generate_std_id():
@@ -99,10 +99,9 @@ def give_file_ext(filename):
     return file_ext
 
 
-@scheduler.task("cron", id="do_clean_up", minute="0", hour="0")
-def cleanup():
-    # A scheduled cleanup task to remove the expired session data
-    # Runs every 24 hours
+def create_admin():
+    """Create the admin account"""
 
-    subprocess.run(["flask", "session_cleanup"])
-    print("Session Cleanup Done!")
+    if not Admin.load("admin"):
+        admin = Admin("admin", flask_bcrypt.generate_password_hash("admin"))
+        Admin.add(admin)

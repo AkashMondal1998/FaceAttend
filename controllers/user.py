@@ -1,8 +1,9 @@
 from flask import abort, request, session
 from flask_restx import Namespace, Resource, fields
-from controllers.helpers import if_logged_in, login_required
+from controllers.helpers import login_required
 from models.user import User
 from .utils import check_email
+from extensions import flask_bcrypt
 
 api = Namespace("user", description="User related operations")
 
@@ -15,10 +16,17 @@ user = api.model(
     },
 )
 
+user_list = api.model(
+    "user_list",
+    {
+        "name": fields.String(description="User's Name"),
+        "email": fields.String(description="User's Email"),
+    },
+)
+
 
 @api.route("/login")
 class login(Resource):
-    @if_logged_in
     def post(self):
         """Login User"""
 
@@ -36,21 +44,25 @@ class login(Resource):
         if not ret:
             abort(400, email)
 
-        # check if the email and password are valid
-        if not User.check_user(email, password):
-            abort(400, "Email or password is wrong!")
+        # load the user
+        user = User.load(email)
 
-        # load the user to get the user's name
-        name = User.load(email).name
+        # check the user details
+        if not user:
+            abort(400, "Wrong email!")
+        if not flask_bcrypt.check_password_hash(user.password, password):
+            abort(400, "Wrong password!")
 
-        session["email"] = request.form.get("email")
-        session["name"] = name
+        session["email"] = user.email
+        session["name"] = user.name
+        session["role"] = user.role
+        session.permanent = True
         return {"message": "Logged In successfully"}
 
 
 @api.route("/logout")
 class Logout(Resource):
-    @login_required
+    @login_required("user")
     def post(self):
         """Logout User"""
 
@@ -58,11 +70,11 @@ class Logout(Resource):
         return {"message": "Logged Out successfully"}
 
 
-@api.route("/register")
-class Register(Resource):
-    @if_logged_in
+@api.route("/add")
+class Add(Resource):
+    @login_required("admin")
     def post(self):
-        """Register User"""
+        """Add User"""
 
         name = request.form.get("name")
         email = request.form.get("email")
@@ -87,23 +99,49 @@ class Register(Resource):
         if not ret:
             abort(400, email)
 
-        # check if the user is already registered
+        # check if the user is already added
         if User.load(email):
-            abort(403, "You are already registered!")
+            abort(409, "User is already added!")
 
         user = User(name, email, password)
 
         # add the user
         user.add()
 
-        return {"message": "Successfully registered!"}, 201
+        return {"message": "Successfully added!"}, 201
+
+
+@api.route("/delete/<email>")
+class Delete(Resource):
+    @login_required("admin")
+    def delete(self, email):
+        """Delete an user"""
+
+        user = User.load(email)
+        if not user:
+            abort(400, f"No user with email {email}!")
+        user.delete()
+        return {"message": "User deleted!"}
+
+
+@api.route("/info")
+class UserInfo(Resource):
+    @api.marshal_with(user)
+    @login_required("user")
+    def get(self):
+        """Get the authenticated user info"""
+
+        return session
 
 
 @api.route("/get")
-class UserInfo(Resource):
-    @api.marshal_with(user)
-    @login_required
+class UserList(Resource):
+    @api.marshal_list_with(user_list)
+    @login_required("admin")
     def get(self):
-        """Get the authenticated  user info"""
+        "User List"
 
-        return session
+        users = User.user_list()
+        if not users:
+            return " ", 204
+        return users
