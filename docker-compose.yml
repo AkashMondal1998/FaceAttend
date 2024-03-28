@@ -2,10 +2,11 @@ services:
   database:
     image: mysql:8.0-debian
     environment:
+      - MYSQL_INITDB_SKIP_TZINFO=yes
       - MYSQL_ROOT_PASSWORD=mondal
-      - MYSQL_DATABASE=project
       - MYSQL_USER=test
       - MYSQL_PASSWORD=test
+      - MYSQL_DATABASE=project
 
   app:
     image: mondalakash/attendance_api:latest

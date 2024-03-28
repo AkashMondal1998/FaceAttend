@@ -1,15 +1,14 @@
-from flask import abort, after_this_request, request, send_file
+from flask import abort, after_this_request, send_file
 from flask_restx import Namespace, Resource, fields
 from werkzeug.utils import secure_filename
 from controllers.helpers import login_required
 from models.student import Student
-from .utils import ImageUrl, allowed_files, check_email
+from forms.student import StudentForm
+from .utils import ImageUrl
 import os
 
 api = Namespace("students", description="Student related operations")
 
-
-UPLOAD_FOLDER = "photos"
 
 # student list api response model
 student_list_model = api.model(
@@ -39,40 +38,24 @@ class AddStudent(Resource):
     def post(self):
         """Add a student"""
 
-        image = request.files.get("image")
-        name = request.form.get("name")
-        email = request.form.get("email")
+        form = StudentForm()
+        if form.validate_on_submit():
+            name, email, image = form.name.data, form.email.data, form.image.data
+            filename = secure_filename(image.filename)
 
-        if not image:
-            abort(400, "Image is required")
-        if not name:
-            abort(400, "Name is required")
-        if not email:
-            abort(400, "Email is required")
+            # check if the student is already present in the database
+            if Student.load_email(email):
+                abort(409, f"Student with email {email} is already present!")
 
-        # check if email is valid
-        email, ret = check_email(email)
-        if not ret:
-            abort(400, email)
+            student = Student(name, email, filename)
 
-        # check if the file is of supported format
-        if not allowed_files(image.filename):
-            abort(400, "Image file extension not supported!")
+            # add the student to the database
+            img_file_name = student.add()
 
-        filename = secure_filename(image.filename)
-
-        # check if the student is already present in the database
-        if Student.load_email(email):
-            abort(409, f"Student with email {email} is already present!")
-
-        student = Student(name, email, filename)
-
-        # add the student to the database
-        img_file_name = student.add()
-
-        # save the file to the file system
-        image.save(os.path.join(UPLOAD_FOLDER, img_file_name))
-        return {"message": "Student added successfully"}, 201
+            # save the file to the file system
+            image.save(os.path.join("photos", img_file_name))
+            return {"message": "Student added successfully"}, 201
+        return form.errors, 400
 
 
 @api.route("/get")

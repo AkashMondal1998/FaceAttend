@@ -183,5 +183,5 @@ run.py
 
 wait-for-it.sh
 
-.vscode
+.vscode/
 

@@ -1,8 +1,8 @@
-from flask import abort, request, session
+from flask import abort, session
 from flask_restx import Namespace, Resource, fields
 from controllers.helpers import login_required
 from models.user import User
-from .utils import check_email
+from forms.user import UserForm, UserLoginForm
 from extensions import flask_bcrypt
 
 api = Namespace("user", description="User related operations")
@@ -30,34 +30,25 @@ class login(Resource):
     def post(self):
         """Login User"""
 
-        email = request.form.get("email")
-        password = request.form.get("password")
+        form = UserLoginForm()
+        if form.validate_on_submit():
+            email, password = form.email.data, form.password.data
 
-        # check if the any of the given fields are blank
-        if not email:
-            abort(400, "Email is required")
-        if not password:
-            abort(400, "Password is required")
+            # load the user
+            user = User.load(email)
 
-        # check if email is valid
-        email, ret = check_email(email)
-        if not ret:
-            abort(400, email)
+            # check the user details
+            if not user:
+                abort(400, "Wrong email!")
+            if not flask_bcrypt.check_password_hash(user.password, password):
+                abort(400, "Wrong password!")
 
-        # load the user
-        user = User.load(email)
-
-        # check the user details
-        if not user:
-            abort(400, "Wrong email!")
-        if not flask_bcrypt.check_password_hash(user.password, password):
-            abort(400, "Wrong password!")
-
-        session["email"] = user.email
-        session["name"] = user.name
-        session["role"] = user.role
-        session.permanent = True
-        return {"message": "Logged In successfully"}
+            session["email"] = user.email
+            session["name"] = user.name
+            session["role"] = user.role
+            session.permanent = True
+            return {"message": "Logged In successfully"}
+        return form.errors, 400
 
 
 @api.route("/logout")
@@ -76,39 +67,21 @@ class Add(Resource):
     def post(self):
         """Add User"""
 
-        name = request.form.get("name")
-        email = request.form.get("email")
-        password = request.form.get("password")
-        confirm_password = request.form.get("confirm_password")
+        form = UserForm()
+        if form.validate_on_submit():
+            name, email, password = form.name.data, form.email.data, form.password.data
 
-        # check if the any of the given fields are blank
-        if not name:
-            abort(400, "Name is required!")
-        if not email:
-            abort(400, "Email is required!")
-        if not password:
-            abort(400, "Password is required")
-        if not confirm_password:
-            abort(400, "Confirm Password is required")
+            # check if the user is already added
+            if User.load(email):
+                abort(409, "User is already added!")
 
-        if password != confirm_password:
-            abort(400, "Password and confirm password has to be same!")
+            user = User(name, email, password)
 
-        # check if email is a valid email address
-        email, ret = check_email(email)
-        if not ret:
-            abort(400, email)
+            # add the user
+            user.add()
 
-        # check if the user is already added
-        if User.load(email):
-            abort(409, "User is already added!")
-
-        user = User(name, email, password)
-
-        # add the user
-        user.add()
-
-        return {"message": "Successfully added!"}, 201
+            return {"message": "Successfully added!"}, 201
+        return form.errors, 400
 
 
 @api.route("/delete/<email>")
@@ -119,7 +92,7 @@ class Delete(Resource):
 
         user = User.load(email)
         if not user:
-            abort(400, f"No user with email {email}!")
+            abort(404, f"No user with email {email}")
         user.delete()
         return {"message": "User deleted!"}
 

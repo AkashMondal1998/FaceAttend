@@ -15,7 +15,7 @@ url = URL.create(
 
 class Config:
     UPLOAD_FOLDER = "photos"
-    MAX_CONTENT_LENGTH = 1 * 1000 * 1000
+    WTF_CSRF_ENABLED = False
     SQLALCHEMY_DATABASE_URI = url
     SECRET_KEY = os.environ["secret_key"]
     PERMANENT_SESSION_LIFETIME = timedelta(days=7)
